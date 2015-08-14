@@ -1,6 +1,5 @@
 package me.hosiet.testingapp1;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -20,7 +19,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 
-public class MainActivity extends /*ActionBarActivity*/AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     public final static String EXTRA_MESSAGE = "me.hosiet.testingapp1.MESSAGE";
     private Button [] mButton = new Button[9]; /* only declaration, not defination; not using 0 */
@@ -79,41 +78,55 @@ public class MainActivity extends /*ActionBarActivity*/AppCompatActivity {
         String message = editText.getText().toString();
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
-        return;
     }
 
     /** Send to Raspberry Pi */
     public void sendMessageToPi(View view) {
         if (view == null) {
             /* view must not be null */
+            Log.e("ERROR1", "View is NULL!");
             return;
         }
-        EditText editText = (EditText) findViewById(R.id.edit_message);
-        editText.setText("");
+
+        final View myview = view; /* set to final to avoid problems? */
 
         /* now begin the socket connection */
-        Socket socket = null;
-        try {
-            /* Don't do it in main thread.
-               or, there will be android.os.NetworkOnMainThreadException */
-            InetAddress serverAddr = InetAddress.getByName("do1.hosiet.me");
-            socket = new Socket(serverAddr, 9999);
-            editText.setText("Connected...");
-            String toServer = view.getTag().toString() + "\n";
-            editText.setText("String is" + toServer);
-            PrintWriter out = new PrintWriter(new BufferedWriter(
-                    new OutputStreamWriter(socket.getOutputStream())),
-                    true);
 
-            out.println(toServer);
-            out.flush();
-            editText.setText("Sent!");*/
+        /* Don't do it in main thread.
+           or, there will be android.os.NetworkOnMainThreadException */
+        // in Android 4.0 or later, you may not perform network operation in main thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Socket socket = null;
+                try {
+                    InetAddress serverAddr = InetAddress.getByName("do1.hosiet.me");
+                    socket = new Socket(serverAddr, 9999);
+                    Log.i("NetworkingThread", "Socket connected");
+                    String toServer = myview.getTag().toString() + "\n";
+                    Log.i("NetworkingThread", "Target string is "+toServer);
+                    PrintWriter out = new PrintWriter(new BufferedWriter(
+                            new OutputStreamWriter(socket.getOutputStream())),
+                            true);
 
-        } /*catch(UnknownHostException e) {
-            /* what?
-        } */catch(Exception e) {
-            e.printStackTrace();
-        }
+                    out.println(toServer);
+                    out.flush();
+                    Log.i("NetworkingThread", "String Sent");
+                } catch(Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (socket == null || socket.isClosed()) {
+                            Log.e("NetworkingThread", "Unexpected null socket object");
+                        } else {
+                            socket.close();
+                        }
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
 
         //pass
     }
