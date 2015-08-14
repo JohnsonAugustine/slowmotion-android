@@ -2,9 +2,11 @@
     <string name="app_name">TestingApp1</string>
 
     <string name="action_settings">Settings</string>
-    <string name="edit_message">Enter a message&gt;</string>
+    <string name="edit_message">Connect to Server first&#8230;</string>
+    <string name="input_hostname">Enter hostname here</string>
     <string name="button_send">Send</string>
-    <string name="button_pi">Send to Pi</string>
+    <string name="button_pi_to_connect">Connect</string>
+    <string name="button_pi_to_disconnect">Disconnect</string>
     <string name="title_activity_display_message">My Message</string>
 
     <!-- 8 buttons to play the music -->
