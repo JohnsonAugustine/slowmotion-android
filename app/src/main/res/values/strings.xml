@@ -19,5 +19,7 @@
     <string name="button_07">7</string>
     <string name="button_08">8</string>
 
+    <string name="default_remote_addr">114.214.195.97</string>
+
     <string name="hello_world">Hello world!</string>
 </resources>

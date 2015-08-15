@@ -96,7 +96,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/input_hostname"
-            android:text="do1.hosiet.me"/>
+            android:text="@string/default_remote_addr"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
