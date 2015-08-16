@@ -17,10 +17,12 @@ import android.widget.EditText;
 
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 
@@ -127,7 +129,30 @@ public class MainActivity extends AppCompatActivity {
             Log.i("MAINHANDLER", "Now reconnecting socket.");
             triggerPiConnect(null);
             triggerPiConnect(null);
-            Log.i("MAINHANDLER", "Reconnect finished.");
+            /* Commented out due to bugs
+            if (msg.obj instanceof Message && msg.obj != null) {
+                //send msg.obj to piThread again
+                while (!connected || piThread == null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Log.e("MAINHANDLER", "Not connected yet, sleeping...");
+                }
+                if (piThread != null) {
+                    Log.e("MAINHANDLER", "PiThread is not null!!!!!");
+                }
+                if (connected) {
+                    Log.e("MAINHANDLER", "connected flag is true!!!!!!");
+                }
+                Log.i("MAINHANDLER", "Resending msg.obj..."+(String)((Message)msg.obj).what);
+                Message msg_resend = piThread.mChildHandler.obtainMessage(((Message)msg.obj).what);
+                Log.i("MAINHANDLER", "msg_resend obtained.");
+                msg_resend.obj = ((Message)msg.obj).obj;
+                piThread.mChildHandler.sendMessage(msg_resend);
+                */
+            Log.i("MAINHANDLER","Resent msg.obj.");
         }
     }
     /**
@@ -161,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(this.LOG_STR, "socket already closed, passing");
                 } else {
                     socket.close();
+                    connected = false;
                     Log.i(this.LOG_STR, "socket closed.");
                 }
             } catch (Exception e) {
@@ -171,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
             if (mylooper != null) {
                 mylooper.quit();
             }
-            connected = false;
+            connected = false;//Need a better place
         }
 
         /**
@@ -193,19 +219,39 @@ public class MainActivity extends AppCompatActivity {
                         /* check connectivity */
 
                         /* send through the socket */
-                        Log.i("HANDLER:", "Will play the music.");
+                        Log.i("MHANDLER:", "Will play the music.");
                         try {
-
+                            /* first of all, write through a '0' to check connectivity */
+                            try {
+                                OutputStream o = socket.getOutputStream();
+                                o.write("0".getBytes());
+                                o.flush();
+                                Log.e("MHANDLER:", "0 written and flushed");
+                            } catch(SocketException e) {
+                                /* connection closed by peer. Now re-connect!
+                                   Solution:
+                                           send a Message msg to UI thread,
+                                           and msg.obj should be current msg.
+                                           UI Handler should re-start the working thread
+                                           and re-send the message.
+                                 */
+                                Log.e("MHANDLER:", "Exception happened when writing 0, exiting current handler");
+                                Message msg_restart = mainHandler.obtainMessage();
+                                msg_restart.obj = msg;
+                                mainHandler.sendMessage(msg_restart);
+                                // Now stop current thread
+                                return;
+                            }
                             PrintWriter out = new PrintWriter(new BufferedWriter(
                                     new OutputStreamWriter(piThread.socket.getOutputStream())),
                                     true);
                             out.println((String) msg.obj);
-                            Log.i("HANDLER:", "Output will be " + msg.obj);
+                            Log.i("MHANDLER:", "Output will be " + msg.obj);
                             out.flush();
                             if (out.checkError()) {
                                 /* Often connection is closed by peer, now re-connect and resend */
-                                Log.e("HANDLER", "Error in writing, now re-send msg");
-                                // TODO ReSEND, let main thread do the job
+                                Log.e("MHANDLER", "Error in writing, now re-send msg");
+                                // TODO ReSEND, let main thread do the job, REMOVE
                                 Message msgReConnect = mainHandler.obtainMessage();
                                 mainHandler.sendMessage(msgReConnect);
                             }
@@ -215,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
                         break;
                 }
-                Log.i("HANDLER", "Handler has finished and reached end.");
+                Log.i("MHANDLER", "MHandler has finished and reached end.");
             }
         }
 
@@ -260,6 +306,7 @@ public class MainActivity extends AppCompatActivity {
             Message msgStopThread = piThread.mChildHandler.obtainMessage(PiLoopedThread.MSG_STOP);
             msgStopThread.obj = null;
             piThread.mChildHandler.sendMessage(msgStopThread);
+            piThread = null;
             button_connect.setText(getResources().getString(R.string.button_pi_to_connect));
             ((EditText) findViewById(R.id.edit_message)).setHint("Disonnected");
             ((EditText) findViewById(R.id.edit_message)).setText("");
