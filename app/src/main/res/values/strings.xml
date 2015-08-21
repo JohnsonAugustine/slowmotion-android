@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Slowmotion</string>
 
@@ -7,19 +8,40 @@
     <string name="button_send">Send</string>
     <string name="button_pi_to_connect">Connect</string>
     <string name="button_pi_to_disconnect">Disconnect</string>
+
     <string name="title_activity_display_message">My Message</string>
+    <string name="title_activity_settings">Settings</string>
 
     <!-- 8 buttons to play the music -->
-    <string name="button_01">1</string>
-    <string name="button_02">2</string>
-    <string name="button_03">3</string>
-    <string name="button_04">4</string>
-    <string name="button_05">5</string>
-    <string name="button_06">6</string>
-    <string name="button_07">7</string>
-    <string name="button_08">8</string>
+    <string name="button_01" translatable="false">1</string>
+    <string name="button_02" translatable="false">2</string>
+    <string name="button_03" translatable="false">3</string>
+    <string name="button_04" translatable="false">4</string>
+    <string name="button_05" translatable="false">5</string>
+    <string name="button_06" translatable="false">6</string>
+    <string name="button_07" translatable="false">7</string>
+    <string name="button_08" translatable="false">8</string>
 
-    <string name="default_remote_addr">114.214.195.97</string>
+    <!-- MainActivity -->
+    <string name="menu_main_settings_string">Settings</string>
+    <string name="menu_main_reset_pref_string">Reset Preferences</string>
+    <string name="menu_main_about_string">About</string>
 
-    <string name="hello_world">Hello world!</string>
+    <!-- About info -->
+    <string name="dialog_about_info">Slowmotion Robot Controller\n\nFor USTC Robogame 2015</string>
+
+    <!-- PREFERENCES -->
+    <string name="pref_network_default_robot_addr" translatable="false">114.214.195.97</string>
+
+    <string name="pref_title_network">Network</string>
+    <string name="pref_title_remote_addr">Robot Remote Address</string>
+    <string name="pref_title_misc">Misc</string>
+    <string name="pref_title_debug">Enable Debug Mode</string>
+
+    <string name="key_pref_category_network" translatable="false">key_pref_category_network</string>
+    <string name="key_pref_remote_addr" translatable="false">key_pref_remote_addr</string>
+    <string name="key_pref_category_misc" translatable="false">key_pref_category_misc</string>
+    <string name="key_pref_debug" translatable="false">key_pref_category_debug</string>
+    <!-- EOF PREFERENCES -->
+
 </resources>

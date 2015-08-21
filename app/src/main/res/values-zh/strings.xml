@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">慢动作</string>
+
+    <string name="action_settings">设置</string>
+    <string name="edit_message">请先连接服务器……</string>
+    <string name="input_hostname">这里输入服务器主机名</string>
+    <string name="button_send">发送</string>
+    <string name="button_pi_to_connect">连接</string>
+    <string name="button_pi_to_disconnect">断开</string>
+
+    <string name="title_activity_display_message">我的消息</string>
+    <string name="title_activity_settings">设置</string>
+
+    <!-- Main Activity -->
+    <string name="menu_main_settings_string">设置</string>
+    <string name="menu_main_reset_pref_string">重置偏好设置</string>
+    <string name="menu_main_about_string">关于</string>
+
+    <!-- About info -->
+    <string name="dialog_about_info">慢动作机器人控制器\n\nUSTC Robogame 2015 参赛作品</string>
+
+    <!-- PREFERENCES -->
+
+    <string name="pref_title_network">网络</string>
+    <string name="pref_title_remote_addr">机器人远程地址</string>
+    <string name="pref_title_misc">杂项</string>
+    <string name="pref_title_debug">启用调试模式</string>
+
+</resources>

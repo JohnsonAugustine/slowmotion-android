@@ -1,10 +1,12 @@
 package me.hosiet.slowmotion;
 
 import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -14,17 +16,15 @@ import android.view.View.OnClickListener;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /* load initial settings preferences */
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        /* set main UI View */
         setContentView(R.layout.activity_main);
 
         /* set Handler for UI thread */
@@ -64,6 +69,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        EditText editText = (EditText) findViewById(R.id.input_hostname);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String myStr = prefs.getString(getString(R.string.key_pref_remote_addr), "");
+        editText.setText(myStr);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -85,12 +99,18 @@ public class MainActivity extends AppCompatActivity {
 
         switch(id) {
             case R.id.action_settings:
+                /* start a settings activity */
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            case R.id.action_reset_pref:
+                /* call resetPreferences() */
+                resetPreferences(null);
                 break;
             case R.id.action_about:
                 new AlertDialog.Builder(this)
-                        .setTitle("About...")
+                        .setTitle(getText(R.string.menu_main_about_string))
                         //.setIcon(R.drawable.abc_tab_indicator_material)
-                        .setMessage("Slowmotion robot\n\nFor USTC Robogame 2015")
+                        .setMessage(getText(R.string.dialog_about_info))
                         .setPositiveButton("Confirm", null)
                         .show();
                 break;
@@ -99,17 +119,25 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /** Reset preferences to default */
+    public void resetPreferences(View view) {
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);//@TODO WHY INVALID?
+        runOnUiThread(new Runnable() {
+                public void run() {
+                Toast.makeText(
+                        getApplicationContext(),
+                        "Reset done [INVALID]",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+    }
+
     /** Will reset to proper positon */
     public void sendMessage(View view) {
-        // Let's try.
-        /*
-        Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.edit_message);
-        String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message);
-        startActivity(intent);*/
         if (!connected) {
             /* do nothing */
+            Log.i("sendMessage", "not connected, do nothing.");
             return;
         } else {
             Message msgResetPosition = piThread.mChildHandler.obtainMessage(PiLoopedThread.MSG_PLAY);
