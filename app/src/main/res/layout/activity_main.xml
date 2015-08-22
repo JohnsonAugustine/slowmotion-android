@@ -20,70 +20,83 @@
             android:text="@string/button_pi_to_connect"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/button_01"
-            android:layout_width="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:tag="@string/button_01"
-            android:text="@string/button_01"/>
-        <Button
-            android:id="@+id/button_02"
-            android:layout_width="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/button_01"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="@string/button_01"
+                android:text="@string/button_01"/>
+            <Button
+                android:id="@+id/button_02"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="@string/button_02"
+                android:text="@string/button_02"/>
+            <Button
+                android:id="@+id/button_03"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="@string/button_03"
+                android:text="@string/button_03"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:tag="@string/button_02"
-            android:text="@string/button_02"/>
-        <Button
-            android:id="@+id/button_03"
-            android:layout_width="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/button_04"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="@string/button_04"
+                android:text="@string/button_04"/>
+            <Button
+                android:id="@+id/button_05"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="@string/button_05"
+                android:text="@string/button_05"/>
+            <Button
+                android:id="@+id/button_06"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="@string/button_06"
+                android:text="@string/button_06"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:tag="@string/button_03"
-            android:text="@string/button_03"/>
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/button_07"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="@string/button_07"
+                android:text="@string/button_07"/>
+            <Button
+                android:id="@+id/button_08"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="@string/button_08"
+                android:text="@string/button_08"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
+        </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/button_04"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:tag="@string/button_04"
-            android:text="@string/button_04"/>
-        <Button
-            android:id="@+id/button_05"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:tag="@string/button_05"
-            android:text="@string/button_05"/>
-        <Button
-            android:id="@+id/button_06"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:tag="@string/button_06"
-            android:text="@string/button_06"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/button_07"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:tag="@string/button_07"
-            android:text="@string/button_07"/>
-        <Button
-            android:id="@+id/button_08"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:tag="@string/button_08"
-            android:text="@string/button_08"/>
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -92,16 +105,13 @@
         android:gravity="bottom"
         >
         <EditText android:id="@+id/input_hostname"
+            android:clickable="false"
+            android:editable="false"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/input_hostname"
             android:text=""/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="sendMessage"
-            android:text="Confirm"/>
     </LinearLayout>
 </LinearLayout>
 

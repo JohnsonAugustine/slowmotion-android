@@ -310,6 +310,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Log.i(this.LOG_STR, "socket connected");
+            Toast.makeText(getApplicationContext(), "socket connected", Toast.LENGTH_SHORT).show();
                 /* start looping */
             Looper.loop();
         }
@@ -365,4 +366,5 @@ public class MainActivity extends AppCompatActivity {
         piThread.mChildHandler.sendMessage(msgPlayNote);
         Log.i("MAIN", "msgPlayNote sent");
     }
+
 }

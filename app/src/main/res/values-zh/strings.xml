@@ -4,7 +4,7 @@
 
     <string name="action_settings">设置</string>
     <string name="edit_message">请先连接服务器……</string>
-    <string name="input_hostname">这里输入服务器主机名</string>
+    <string name="input_hostname">远程主机名</string>
     <string name="button_send">发送</string>
     <string name="button_pi_to_connect">连接</string>
     <string name="button_pi_to_disconnect">断开</string>
