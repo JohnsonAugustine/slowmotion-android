@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Toast.makeText(getApplicationContext(), "socket disconnected", Toast.LENGTH_SHORT).show();
                 /* SHOULD DESTROY THIS THREAD NOW */
             Looper mylooper = Looper.myLooper();
             if (mylooper != null) {

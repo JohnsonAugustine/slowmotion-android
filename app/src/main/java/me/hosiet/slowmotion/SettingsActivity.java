@@ -3,6 +3,7 @@ package me.hosiet.slowmotion;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,9 @@ import android.widget.EditText;
  * Created by hosiet on 15-8-21.
  */
 public class SettingsActivity extends AppCompatActivity implements OnSharedPreferenceChangeListener {
+
+    /** The SettingsFragment object used by the program */
+    SettingsFragment mSettingsFragment = null;
 
     /**
      * Static SettingsFragment class
@@ -36,9 +40,10 @@ public class SettingsActivity extends AppCompatActivity implements OnSharedPrefe
         super.onCreate(savedInstanceState);
 
         // Display the fragment as the content of the activity
+        mSettingsFragment = new SettingsFragment();
         this.getFragmentManager()
                 .beginTransaction()
-                .replace(android.R.id.content, new SettingsFragment())
+                .replace(android.R.id.content, mSettingsFragment)
                 .commit();
     }
 
@@ -46,6 +51,10 @@ public class SettingsActivity extends AppCompatActivity implements OnSharedPrefe
     protected void onResume() {
         super.onResume();
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+        EditTextPreference editTextPref_remoteAddr = (EditTextPreference) mSettingsFragment.findPreference(getString(R.string.key_pref_remote_addr));
+        editTextPref_remoteAddr.setSummary(editTextPref_remoteAddr.getText());
+        EditTextPreference editTextPref_remotePort = (EditTextPreference) mSettingsFragment.findPreference(getString(R.string.key_pref_remote_port));
+        editTextPref_remotePort.setSummary(editTextPref_remotePort.getText());
     }
 
     @Override

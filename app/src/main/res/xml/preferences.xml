@@ -6,15 +6,22 @@
         android:title="@string/pref_title_network"
         android:key="@string/key_pref_category_network">
         <EditTextPreference
+            android:id="@+id/pref_edittext_remote_addr"
             android:title="@string/pref_title_remote_addr"
             android:defaultValue="@string/pref_network_default_robot_addr"
             android:key="@string/key_pref_remote_addr" />
+        <EditTextPreference
+            android:id="@+id/pref_edittext_remote_port"
+            android:title="@string/pref_title_remote_port"
+            android:defaultValue="@string/pref_network_default_robot_port"
+            android:key="@string/key_pref_remote_port" />
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/pref_title_misc"
         android:key="@string/key_pref_category_misc">
         <CheckBoxPreference
+            android:id="@+id/pref_checkbox_debug"
             android:title="@string/pref_title_debug"
             android:defaultValue="false"
             android:key="@string/key_pref_debug" />

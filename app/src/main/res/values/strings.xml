@@ -32,14 +32,17 @@
 
     <!-- PREFERENCES -->
     <string name="pref_network_default_robot_addr" translatable="false">114.214.195.97</string>
+    <string name="pref_network_default_robot_port" translatable="false">9999</string>
 
     <string name="pref_title_network">Network</string>
     <string name="pref_title_remote_addr">Robot Remote Address</string>
+    <string name="pref_title_remote_port">Robot Remote Port</string>
     <string name="pref_title_misc">Misc</string>
     <string name="pref_title_debug">Enable Debug Mode</string>
 
     <string name="key_pref_category_network" translatable="false">key_pref_category_network</string>
     <string name="key_pref_remote_addr" translatable="false">key_pref_remote_addr</string>
+    <string name="key_pref_remote_port" translatable="false">key_pref_remote_port</string>
     <string name="key_pref_category_misc" translatable="false">key_pref_category_misc</string>
     <string name="key_pref_debug" translatable="false">key_pref_category_debug</string>
     <!-- EOF PREFERENCES -->
