@@ -100,7 +100,7 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="bottom"
         >
@@ -112,6 +112,18 @@
             android:layout_height="wrap_content"
             android:hint="@string/input_hostname"
             android:text=""/>
+
     </LinearLayout>
+
+    <Button
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:text="Explorer"
+        android:id="@+id/button" />
+
+    <TextView android:id="@+id/text"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
 </LinearLayout>
 

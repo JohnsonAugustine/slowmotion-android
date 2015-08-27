@@ -1,8 +1,11 @@
 package me.hosiet.slowmotion;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -16,9 +19,14 @@ import android.view.View.OnClickListener;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -33,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static boolean connected = false; /* for whether piThread has started or not */
     PiLoopedThread piThread = null;
+    private static final int REQUEST_EX = 1;
+    TextView textView = null;
+    Uri uriData = null;
 
     private MainHandler mainHandler = null;
 
@@ -41,10 +52,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         /* load initial settings preferences */
+
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         /* set main UI View */
         setContentView(R.layout.activity_main);
+        final Activity mActivity = this;
+
 
         /* set Handler for UI thread */
         mainHandler = new MainHandler();
@@ -66,6 +80,38 @@ public class MainActivity extends AppCompatActivity {
             mButton[i] = (Button)findViewById(getResources().getIdentifier("button_0" + Integer.toString(i), "id", this.getPackageName()));
             mButton[i].setOnClickListener(play_listener);
         }
+
+        Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                try {
+                    mActivity.startActivityForResult(Intent.createChooser(intent, "Select"), REQUEST_EX);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        String path;
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_EX) {
+                uriData = intent.getData();
+                Log.e("onActivityResult","Now uriData is"+uriData.toString());
+                TextView text = (TextView) findViewById(R.id.text);
+                text.setText("Received:: " + uriData);
+
+                /* Now try to open the file */
+                //File myfile = new File(uriData.getPath());
+
+            }
+        }
     }
 
     @Override
@@ -75,6 +121,10 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String myStr = prefs.getString(getString(R.string.key_pref_remote_addr), "");
         editText.setText(myStr);
+        if (uriData != null) {
+            Log.e("OnResume","last");
+            ((TextView) findViewById(R.id.text)).setText(readPhoneNumber(uriData.toString(), uriData));
+        }
     }
 
     @Override
@@ -366,6 +416,51 @@ public class MainActivity extends AppCompatActivity {
         msgPlayNote.obj = toServer;
         piThread.mChildHandler.sendMessage(msgPlayNote);
         Log.i("MAIN", "msgPlayNote sent");
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public String readPhoneNumber(String strFilePath, Uri myuri)
+    {
+        String content = ""; //文件内容字符串
+
+        //如果path是传递过来的参数，可以做一个非目录的判断
+        try {
+            InputStream instream = getContentResolver().openInputStream(myuri);
+            if (instream != null)
+            {
+                InputStreamReader inputreader = new InputStreamReader(instream);
+                BufferedReader buffreader = new BufferedReader(inputreader);
+                String line;
+                //分行读取
+                while (( line = buffreader.readLine()) != null) {
+                    content += line + "\n";
+                }
+                instream.close();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.e("My Content:", content);
+        return content;
     }
 
 }
