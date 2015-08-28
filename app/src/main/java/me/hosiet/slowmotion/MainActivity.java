@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -51,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_EX = 1;
 
     Uri uriData = null; /* for the file */
+    String content = ""; //文件内容字符串
 
     private MainHandler mainHandler = null;
 
@@ -183,17 +183,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        //String path;
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_EX) {
                 uriData = intent.getData();
                 Log.e("onActivityResult","Now uriData is"+uriData.toString());
                 TextView text = (TextView) findViewById(R.id.text);
                 text.setText("Received:: " + uriData);
-
-                /* Now try to open the file */
-                //File myfile = new File(uriData.getPath());
-
             }
         }
     }
@@ -250,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_about:
                 new AlertDialog.Builder(this)
                         .setTitle(getText(R.string.menu_main_about_string))
-                        //.setIcon(R.drawable.abc_tab_indicator_material)
+                                //.setIcon(R.drawable.abc_tab_indicator_material)
                         .setMessage(getText(R.string.dialog_about_info))
                         .setPositiveButton("Confirm", null)
                         .show();
@@ -264,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
     public void resetPreferences(View view) {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, true);//@TODO WHY INVALID?
         runOnUiThread(new Runnable() {
-                public void run() {
+            public void run() {
                 Toast.makeText(
                         getApplicationContext(),
                         "Reset done [INVALID]",
@@ -272,19 +267,6 @@ public class MainActivity extends AppCompatActivity {
                 ).show();
             }
         });
-    }
-
-    /** Will reset to proper positon */
-    public void sendMessage(View view) {
-        if (!connected) {
-            /* do nothing */
-            Log.i("sendMessage", "not connected, do nothing.");
-            return;
-        } else {
-            Message msgResetPosition = piThread.mChildHandler.obtainMessage(PiLoopedThread.MSG_PLAY);
-            msgResetPosition.obj = "0\n";
-            piThread.mChildHandler.sendMessage(msgResetPosition);
-        }
     }
 
     /**
@@ -336,8 +318,9 @@ public class MainActivity extends AppCompatActivity {
         public final String LOG_STR = "PiThread";
 
         /** Looper Message Types */
-        private static final int MSG_STOP = 0;
+        private static final int MSG_STOP = 3;
         private static final int MSG_PLAY = 1;
+        private static final int IS_TEXT = 2;
 
         /* Message Handler */
         private Handler mChildHandler = null;
@@ -380,16 +363,59 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void handleMessage(Message msg) {
+                Log.e("Mhandler", "msg.what ="+String.valueOf(msg.what));
                 /* should handle msg here */
-                switch(msg.what) {
+                switch (msg.what) {
+
                     case PiLoopedThread.MSG_STOP:
                         myQuitLoopState();
                         break;
-                    case PiLoopedThread.MSG_PLAY:
+                    case PiLoopedThread.IS_TEXT:
+                        Log.e("Mhandler", "receivetext is "+msg.obj);
+                        try {
+                            Log.e("MHandler", "inside the first try");
+                            try {
+                                Log.e("MHandler", "now socket is");
+                                if (socket == null){
+                                    Log.e("MHandler", "Now socket is nul;");
+                                }
+                                OutputStream sendtext = socket.getOutputStream();
+                                sendtext.write(("1\n").getBytes());
+                                sendtext.flush();
+                            } catch (SocketException e) {
+                                Log.e("Mhandler:", "Exception happened when writing 1, exiting current handler");
+                                Message msg_restart = mainHandler.obtainMessage();
+                                msg_restart.obj = msg;
+                                mainHandler.sendMessage(msg_restart);
+                                // Now stop current thread
+                                return;
+                            } catch(Exception f) {
+                                Log.e("MHandler", "inside common exception");
+                                Log.e("MHandler", f.toString());
+                            }
+                            PrintWriter out = new PrintWriter(new BufferedWriter(
+                                    new OutputStreamWriter(socket.getOutputStream())),
+                                    true);
+                            out.println((String) msg.obj);
+                            Log.i("Mhandler:", "Output will be " + msg.obj);
+                            out.flush();
+                            if (out.checkError()) {
+                                /* Often connection is closed by peer, now re-connect and resend */
+                                Log.e("MHANDLER", "Error in writing, now re-send msg");
+                                // TODO ReSEND, let main thread do the job, REMOVE
+                                Message msgReConnect = mainHandler.obtainMessage();
+                                mainHandler.sendMessage(msgReConnect);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        Log.e("MHandler", "END OF IS_TEXT");
+                        break;
+                       case PiLoopedThread.MSG_PLAY:
                         /* check connectivity */
 
                         /* send through the socket */
-                        Log.i("MHANDLER:", "Will play the music.");
+                        Log.e("MHANDLER:", "Will play the music.");
                         try {
                             /* first of all, write through a '0' to check connectivity */
                             try {
@@ -416,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
                                     new OutputStreamWriter(piThread.socket.getOutputStream())),
                                     true);
                             out.println((String) msg.obj);
-                            Log.i("MHANDLER:", "Output will be " + msg.obj);
+                            Log.e("MHANDLER:", "Output will be " + msg.obj);
                             out.flush();
                             if (out.checkError()) {
                                 /* Often connection is closed by peer, now re-connect and resend */
@@ -431,7 +457,7 @@ public class MainActivity extends AppCompatActivity {
 
                         break;
                 }
-                Log.i("MHANDLER", "MHandler has finished and reached end.");
+                Log.e("MHANDLER", "MHandler has finished and reached end.");
             }
         }
 
@@ -509,49 +535,38 @@ public class MainActivity extends AppCompatActivity {
         Log.i("MAIN", "msgPlayNote sent");
     }
 
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
     public String readPhoneNumber(String strFilePath, Uri myuri)
     {
-        String content = ""; //文件内容字符串
-
         //如果path是传递过来的参数，可以做一个非目录的判断
         try {
             InputStream instream = getContentResolver().openInputStream(myuri);
-            if (instream != null)
-            {
+            if (instream != null) {
                 InputStreamReader inputreader = new InputStreamReader(instream);
                 BufferedReader buffreader = new BufferedReader(inputreader);
                 String line;
                 //分行读取
-                while (( line = buffreader.readLine()) != null) {
+                while ((line = buffreader.readLine()) != null) {
                     content += line + "\n";
+                    if (!connected) {
+                        Log.e("readphonenumber", "Not connected, don't do anything");
+                    }
+                    if (piThread.mChildHandler!=null) {
+                        Message mestext = piThread.mChildHandler.obtainMessage();
+                        mestext.obj = line;
+                        mestext.what = PiLoopedThread.IS_TEXT;
+                        Log.e("mainHandler", "Now msg.what is"+String.valueOf(mestext.what)+" and msg.obj is"+mestext.obj);
+                        piThread.mChildHandler.sendMessage(mestext);
+                        Log.e("handler","done");
+                    }
                 }
                 instream.close();
             }
-        }
-        catch (IOException e) {
+        }catch (IOException e) {
             e.printStackTrace();
         }
         Log.e("My Content:", content);
         return content;
     }
+
 
 }
