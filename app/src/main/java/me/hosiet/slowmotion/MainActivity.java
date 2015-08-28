@@ -3,6 +3,7 @@ package me.hosiet.slowmotion;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -10,6 +11,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -17,8 +21,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.content.Intent;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,10 +49,23 @@ public class MainActivity extends AppCompatActivity {
     private static boolean connected = false; /* for whether piThread has started or not */
     PiLoopedThread piThread = null;
     private static final int REQUEST_EX = 1;
-    TextView textView = null;
-    Uri uriData = null;
+
+    Uri uriData = null; /* for the file */
 
     private MainHandler mainHandler = null;
+
+    /* For application bar and left drawer */
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private String[] mPlanetTitles;
+    private ListView mDrawerList;
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            Log.e("ITEMCLICK", "Not implemented");
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,11 +115,75 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /* the initialization for left-side drawer */
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        mPlanetTitles = getResources().getStringArray(R.array.drawer_list_array);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.drawer_list_item, mPlanetTitles));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                        /* host activity */
+                mDrawerLayout,               /* DrawerLayout object */
+                R.string.drawer_open,  /* "open drawer" description */
+                R.string.drawer_close  /* "close drawer" description */
+                ){
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                ActionBar mActionBar = getSupportActionBar();
+                if (mActionBar == null) {
+                    Log.e("MAIN_onCreate","ACTION BAR IS NULL!");
+                } else {
+                    mActionBar.setTitle(getString(R.string.title_activity_main));
+                }
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                ActionBar mActionBar = getSupportActionBar();
+                if (mActionBar == null) {
+                    Log.e("MAIN_onCreate","ACTION BAR IS NULL!");
+                } else {
+                    mActionBar.setTitle(getString(R.string.title_drawer));
+                }
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        ActionBar mActionBar = getSupportActionBar();
+        if (mActionBar != null) {
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setHomeButtonEnabled(true);
+        }
 
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        String path;
+        //String path;
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_EX) {
                 uriData = intent.getData();
@@ -136,6 +220,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.

@@ -11,6 +11,8 @@
 
     <string name="title_activity_display_message">我的消息</string>
     <string name="title_activity_settings">设置</string>
+    <string name="title_activity_main">@string/app_name</string>
+    <string name="title_drawer">功能选择</string>
 
     <!-- Main Activity -->
     <string name="menu_main_settings_string">设置</string>

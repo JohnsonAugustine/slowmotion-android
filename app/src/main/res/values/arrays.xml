@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="drawer_list_array">
+        　　        <item>Play Single Note</item>
+        　　        <item>Play Music</item>
+    </string-array>
+</resources>
