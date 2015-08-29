@@ -567,6 +567,4 @@ public class MainActivity extends AppCompatActivity {
         Log.e("My Content:", content);
         return content;
     }
-
-
 }
