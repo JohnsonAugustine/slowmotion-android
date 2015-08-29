@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="drawer_list_array">
+        <item>弹奏音符</item>
+        <item>播放音乐</item>
+        <item />
+        <!--<item>测试选项</item>-->
+    </string-array>
+</resources>
