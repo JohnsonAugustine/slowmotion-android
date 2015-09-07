@@ -13,6 +13,8 @@
     <string name="title_activity_settings">设置</string>
     <string name="title_activity_main">@string/app_name</string>
     <string name="title_drawer">功能选择</string>
+    <string name="title_activity_debug_default">测试</string>
+    <string name="title_activity_debug_music">音乐播放（测试）</string>
 
     <!-- Main Activity -->
     <string name="menu_main_settings_string">设置</string>
@@ -29,5 +31,10 @@
     <string name="pref_title_remote_port">机器人远程端口</string>
     <string name="pref_title_misc">杂项</string>
     <string name="pref_title_debug">启用调试模式</string>
+
+    <!-- ========  Drawer Strings ============ -->
+    <string name="drawer_play_note">弹奏音符</string>
+    <string name="drawer_play_music">播放音乐</string>
+    <string name="drawer_debug">@string/title_activity_debug_default</string>
 
 </resources>

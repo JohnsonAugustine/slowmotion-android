@@ -14,6 +14,9 @@
     <string name="title_activity_main">@string/app_name</string>
     <string name="title_drawer">Fuction Selection</string>
 
+    <string name="title_activity_debug_default">Debugging</string>
+    <string name="title_activity_debug_music">Music Play (Debug)</string>
+
     <!-- about drawer -->
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
@@ -51,7 +54,6 @@
     <string name="key_pref_remote_port" translatable="false">key_pref_remote_port</string>
     <string name="key_pref_category_misc" translatable="false">key_pref_category_misc</string>
     <string name="key_pref_debug" translatable="false">key_pref_category_debug</string>
-    <string name="title_activity_debug">DebugActivity</string>
 
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
@@ -71,6 +73,10 @@
     <string name="id_note_drawer_list" translateable="false">0</string>
     <!-- EOF DRAWER LIST -->
 
+    <!-- ========  Drawer Strings ============ -->
+    <string name="drawer_play_note">Play Notes</string>
+    <string name="drawer_play_music">Play Music</string>
+    <string name="drawer_debug">@string/title_activity_debug_default</string>
 
 
 </resources>

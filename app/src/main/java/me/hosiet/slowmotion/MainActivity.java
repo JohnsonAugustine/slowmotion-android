@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -91,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final Activity mActivity = this;
 
+        /* set up Toolbar */
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.main_activity_toolbar);
+        setSupportActionBar(toolbar);
 
         /* set Handler for UI thread */
         mainHandler = new MainHandler();
@@ -150,23 +154,13 @@ public class MainActivity extends AppCompatActivity {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                ActionBar mActionBar = getSupportActionBar();
-                if (mActionBar == null) {
-                    Log.e("MAIN_onCreate","ACTION BAR IS NULL!");
-                } else {
-                    mActionBar.setTitle(getString(R.string.title_activity_main));
-                }
+                toolbar.setTitle(R.string.title_activity_main);
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                ActionBar mActionBar = getSupportActionBar();
-                if (mActionBar == null) {
-                    Log.e("MAIN_onCreate","ACTION BAR IS NULL!");
-                } else {
-                    mActionBar.setTitle(getString(R.string.title_drawer));
-                }
+                toolbar.setTitle(getString(R.string.title_drawer));
             }
         };
 
@@ -175,8 +169,8 @@ public class MainActivity extends AppCompatActivity {
 
         ActionBar mActionBar = getSupportActionBar();
         if (mActionBar != null) {
-            mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
         }
 
     }
