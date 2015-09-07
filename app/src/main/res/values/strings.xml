@@ -64,4 +64,13 @@
     <string name="title_activity_music">MusicActivity</string>
     <!-- EOF PREFERENCES -->
 
+    <!-- DRAWER LIST -->
+    <!-- See Also arrays.xml -->
+    <string name="id_debug_drawer_list" translatable="false">2</string>
+    <string name="id_music_drawer_list" translateable="false">1</string>
+    <string name="id_note_drawer_list" translateable="false">0</string>
+    <!-- EOF DRAWER LIST -->
+
+
+
 </resources>

@@ -3,7 +3,7 @@
     <string-array name="drawer_list_array">
         <item>Play Single Note</item>
         <item>Play Music</item>
-        <item />
+        <item>Debug</item>
         <!--<item>Debug Options</item>-->
     </string-array>
 </resources>
