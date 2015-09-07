@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -48,11 +49,13 @@ public class MainActivity extends AppCompatActivity {
     private static boolean connected = false; /* for whether piThread has started or not */
     PiLoopedThread piThread = null;
     private static final int REQUEST_EX = 1;
+    private static final int REQUEST_DEBUG = 2;
 
     Uri uriData = null; /* for the file */
     String content = ""; //文件内容字符串
 
     private MainHandler mainHandler = null;
+    public static Socket mainSocket = null;// for the external use of socket
 
     /* For application bar and left drawer */
     private DrawerLayout mDrawerLayout;
@@ -63,7 +66,16 @@ public class MainActivity extends AppCompatActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
-            Log.e("ITEMCLICK", "Not implemented");
+            /*Toast.makeText(
+                    getApplicationContext(),
+                    "position:'"+String.valueOf(position)+"'\nid:'"+String.valueOf(id)+"'",
+                    Toast.LENGTH_SHORT
+            ).show();*/
+            if (String.valueOf(id).equals(getString(R.string.id_debug_drawer_list))) {
+                // Send out intent to open DebugActivity
+                Intent debugIntent = new Intent(MainActivity.this, DebugActivity.class);
+                startActivityForResult(debugIntent, REQUEST_DEBUG);
+            }
         }
     }
 
@@ -280,30 +292,6 @@ public class MainActivity extends AppCompatActivity {
             Log.i("MAINHANDLER", "Now reconnecting socket.");
             triggerPiConnect(null);
             triggerPiConnect(null);
-            /* Commented out due to bugs
-            if (msg.obj instanceof Message && msg.obj != null) {
-                //send msg.obj to piThread again
-                while (!connected || piThread == null) {
-                    try {
-                        Thread.sleep(100);
-                    } catch(InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Log.e("MAINHANDLER", "Not connected yet, sleeping...");
-                }
-                if (piThread != null) {
-                    Log.e("MAINHANDLER", "PiThread is not null!!!!!");
-                }
-                if (connected) {
-                    Log.e("MAINHANDLER", "connected flag is true!!!!!!");
-                }
-                Log.i("MAINHANDLER", "Resending msg.obj..."+(String)((Message)msg.obj).what);
-                Message msg_resend = piThread.mChildHandler.obtainMessage(((Message)msg.obj).what);
-                Log.i("MAINHANDLER", "msg_resend obtained.");
-                msg_resend.obj = ((Message)msg.obj).obj;
-                piThread.mChildHandler.sendMessage(msg_resend);
-                */
-            Log.i("MAINHANDLER","Resent msg.obj.");
         }
     }
     /**
@@ -338,6 +326,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(this.LOG_STR, "socket already closed, passing");
                 } else {
                     socket.close();
+                    MainActivity.mainSocket = null;
                     connected = false;
                     Log.i(this.LOG_STR, "socket closed.");
                 }
@@ -476,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
             } catch(Exception e) {
                 e.printStackTrace();
             }
-
+            MainActivity.mainSocket = this.socket;
             Log.i(this.LOG_STR, "socket connected");
             Toast.makeText(getApplicationContext(), "socket connected", Toast.LENGTH_SHORT).show();
                 /* start looping */
