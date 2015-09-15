@@ -22,7 +22,16 @@
     <string name="menu_main_about_string">关于</string>
 
     <!-- About info -->
+    <string name="str_confirm">确定</string>
     <string name="dialog_about_info">慢动作机器人控制器\n\nUSTC Robogame 2015 参赛作品</string>
+    <string name="str_not_implemented">功能未实现</string>
+    <string name="str_robot_reconnect">重新连接</string>
+    <string name="str_conn_established">已连接机器人</string>
+    <string name="str_conn_disconnected">已断开连接</string>
+    <string name="str_conn_reconnected">已重新连接</string>
+    <string name="str_error_when_connecting">尝试连接时发生错误，请重试。</string>
+    <string name="str_error_when_disconnecting">尝试断开时发生错误，请检查日志。</string>
+    <string name="str_error_when_reconnecting">尝试重新时发生错误，请检查日志。</string>
 
     <!-- PREFERENCES -->
 
@@ -34,7 +43,9 @@
 
     <!-- ========  Drawer Strings ============ -->
     <string name="drawer_play_note">弹奏音符</string>
+    <string name="drawer_play_note_explanation">即时敲击音符</string>
     <string name="drawer_play_music">播放音乐</string>
+    <string name="drawer_play_music_explanation">使用扬声器放播放音乐</string>
     <string name="drawer_debug">@string/title_activity_debug_default</string>
 
 </resources>

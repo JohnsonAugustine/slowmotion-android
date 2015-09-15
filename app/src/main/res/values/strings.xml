@@ -37,7 +37,16 @@
     <string name="menu_main_about_string">About</string>
 
     <!-- About info -->
+    <string name="str_confirm">Confirm</string>
     <string name="dialog_about_info">Slowmotion Robot Controller\n\nFor USTC Robogame 2015</string>
+    <string name="str_not_implemented">Not implemented</string>
+    <string name="str_robot_reconnect">Reconnect</string>
+    <string name="str_conn_established">Robot Connected</string>
+    <string name="str_conn_reconnected">Robot Reonnected</string>
+    <string name="str_conn_disconnected">Robot Disonnected</string>
+    <string name="str_error_when_connecting">Error occurred when connecting.\nPlease try again.</string>
+    <string name="str_error_when_disconnecting">Error occurred when disconnecting.\nPlease check the log.</string>
+    <string name="str_error_when_reconnecting">Error occurred when reconnecting.\nPlease check the log.</string>
 
     <!-- PREFERENCES -->
     <string name="pref_network_default_robot_addr" translatable="false">114.214.195.97</string>
@@ -75,8 +84,13 @@
 
     <!-- ========  Drawer Strings ============ -->
     <string name="drawer_play_note">Play Notes</string>
+    <string name="drawer_play_note_explanation">Hit notes instantly</string>
     <string name="drawer_play_music">Play Music</string>
+    <string name="drawer_play_music_explanation">Play music through speaker</string>
     <string name="drawer_debug">@string/title_activity_debug_default</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

@@ -1,6 +1,7 @@
 package me.hosiet.slowmotion;
 
-import android.os.Message;
+import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.w3c.dom.Attr;
@@ -9,16 +10,14 @@ import org.w3c.dom.Element;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,9 +31,67 @@ import javax.xml.transform.stream.StreamResult;
  * Communicator class
  *
  * Contains much of data-sending functions.
+ * Note that all internet methods must run in background thread.
+ *
  * Created by hosiet on 15-9-5.
  */
 public class Communicator {
+    /**
+     * Connect and return the obtained socket.
+     *
+     * @param context Application Context
+     * No parameters needed; all the data are obtained from Pref.
+     */
+    public static Socket smSocketConnect(Context context)
+    {
+        Socket socket = null;
+        try {
+            /* obtain settings from Preference Manager */
+            InetAddress serverAddr = InetAddress.getByName(PreferenceManager
+                    .getDefaultSharedPreferences(context.getApplicationContext())
+                    .getString(context.getString(R.string.key_pref_remote_addr), "")
+            );
+            Integer serverPort = Integer.valueOf(PreferenceManager
+                    .getDefaultSharedPreferences(context.getApplicationContext())
+                    .getString(context.getString(R.string.key_pref_remote_port), "")
+            );
+
+            /* establish the socket */
+            socket = new Socket(serverAddr, serverPort);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        Log.v("smSocketConnect()", "Socket connected");
+        return socket;
+    }
+
+    public static boolean smSocketDisconnect(Context context, Socket socket) {
+        if (socket == null) {
+            Log.w("smSocketDisconnect()", "socket is null, ignoring.");
+            return true;
+        } else if (socket.isClosed()) {
+            Log.w("smSocketDisconnect()", "socket is already closed, ignoring.");
+            return true;
+        }
+        try {
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        Log.i("smSocketDisconnect()", "socket disconnected normally.");
+        return true;
+    }
+
+    public static Socket smSocketReconnect(Context context, Socket socket) {
+        smSocketDisconnect(context, socket);
+        return smSocketConnect(context);
+    }
+
+    public static void smSendCmd_ResetAll(Socket socket) {
+        smSocketSendText(socket, "<command action=\"reset all\"/>\n");
+    }
+
     public static void smSocketSendText(Socket socket, String xmlstr) {
         // Check input validity
         if (socket == null /* && ! valid xmlstr && socket hasn't been closed*/) {
@@ -54,7 +111,7 @@ public class Communicator {
             out.flush();
             if (out.checkError()) {
                 // resend?
-                Log.e("Communicator", "checked error");
+                Log.e("smSocketSendText()", "checked error.");
             }
         } catch(IOException e) {
             e.printStackTrace();

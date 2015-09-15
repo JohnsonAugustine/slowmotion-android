@@ -38,13 +38,6 @@
             android:name=".DebugActivity"
             android:label="@string/title_activity_debug_default" >
         </activity>
-        <activity
-            android:name=".MusicActivity"
-            android:label="@string/title_activity_music" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="me.hosiet.slowmotion.MainActivity"/>
-        </activity>
     </application>
 
 </manifest>
