@@ -89,7 +89,7 @@ public class Communicator {
     }
 
     public static void smSendCmd_ResetAll(Socket socket) {
-        smSocketSendText(socket, "<command action=\"reset all\"/>\n");
+        smSocketSendText(socket, "<command action=\"reset all\"/>");
     }
 
     public static void smSocketSendText(Socket socket, String xmlstr) {

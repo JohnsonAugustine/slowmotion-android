@@ -100,6 +100,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
         final int DRAWER_ID_NOTE = 1;
         final int DRAWER_ID_MUSIC = 2;
         final int DRAWER_ID_DEBUG = 4;
+        final int DRAWER_ID_DISCONNECT = 6;
         final int DRAWER_ID_SETTINGS = -1;
 
         super.onCreate(savedInstanceState);
@@ -127,6 +128,9 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                 .withName(R.string.drawer_debug)
                 .withIdentifier(DRAWER_ID_DEBUG)
                 .withBadge("333");
+        SecondaryDrawerItem item4 = new SecondaryDrawerItem()
+                .withName(R.string.str_robot_disconnect)
+                .withIdentifier(DRAWER_ID_DISCONNECT);
 
         final Drawer drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -139,7 +143,8 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         item2,
                         new DividerDrawerItem(),
                         item3,
-                        new DividerDrawerItem()
+                        new DividerDrawerItem(),
+                        item4
                 )
                 .build();
 
@@ -148,11 +153,11 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
         drawer.setOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                Toast.makeText(
+                /*Toast.makeText(
                         getApplicationContext(),
                         String.valueOf(position),
                         Toast.LENGTH_SHORT
-                ).show();
+                ).show();*/
                 switch (position) {
                     case DRAWER_ID_NOTE:
                         /* load fragment */
@@ -165,6 +170,11 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         smLoadFragment(musicFragment);
                         break;
                     case DRAWER_ID_DEBUG:
+                        break;
+                    case DRAWER_ID_DISCONNECT:
+                        Message msg = new Message();
+                        msg.what = COMMAND_DISCONNECT;
+                        mHandler.sendMessage(msg);
                         break;
                     case DRAWER_ID_SETTINGS:
                         /* start SettingsActivity */
@@ -320,11 +330,9 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                 break;
             case COMMAND_DISCONNECT:
                 Log.v(NAME_BG_THREAD, "Received COMMAND_DISCONNECT");
-                if (socket == null) {
-                    Log.i(NAME_BG_THREAD, "socket is null, not doing anything.");
-                    break;
-                }
-                if (! Communicator.smSocketDisconnect(getApplicationContext(), socket)) {
+                if (socket == null || !socket.isConnected()) {
+                    Log.i(NAME_BG_THREAD, "socket is invalid, not doing anything.");
+                } else if (! Communicator.smSocketDisconnect(getApplicationContext(), socket)) {
                     Toast.makeText(
                             getApplicationContext(),
                             getString(R.string.str_error_when_disconnecting),
@@ -386,7 +394,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                 received_string = temp_str;
                 break;
             case COMMAND_SEND:
-                Log.v(NAME_BG_THREAD, "Received COMMAND_SEND");
+                Log.v(NAME_BG_THREAD, "Received COMMAND_SEND, str is "+(String)message.obj);
                 try {
                     Communicator.smSocketSendText(socket, (String) message.obj);
                 } catch (Exception e) {
@@ -408,6 +416,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
      * @param fragment fragment to be inserted
      */
     public void smLoadFragment(Fragment fragment) {
+        Log.i("smLoadFragment", "Now trying to load new fragment.");
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.detach(fragmentManager.findFragmentById(R.id.debug_content_frame)); //detach first

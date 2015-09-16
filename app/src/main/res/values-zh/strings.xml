@@ -25,6 +25,7 @@
     <string name="str_confirm">确定</string>
     <string name="dialog_about_info">慢动作机器人控制器\n\nUSTC Robogame 2015 参赛作品</string>
     <string name="str_not_implemented">功能未实现</string>
+    <string name="str_robot_disconnect">断开连接</string>
     <string name="str_robot_reconnect">重新连接</string>
     <string name="str_conn_established">已连接机器人</string>
     <string name="str_conn_disconnected">已断开连接</string>
@@ -48,5 +49,9 @@
     <string name="drawer_play_music">播放音乐</string>
     <string name="drawer_play_music_explanation">使用扬声器放播放音乐</string>
     <string name="drawer_debug">@string/title_activity_debug_default</string>
+
+    <!-- &&&&&&&&&&  Play Musics &&&&&&&&&&&&&&  -->
+    <string name="str_music_play_stop">播放/停止</string>
+    <string name="str_music_pause">暂停</string>
 
 </resources>

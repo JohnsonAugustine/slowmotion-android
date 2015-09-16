@@ -40,6 +40,7 @@
     <string name="str_confirm">Confirm</string>
     <string name="dialog_about_info">Slowmotion Robot Controller\n\nFor USTC Robogame 2015</string>
     <string name="str_not_implemented">Not implemented</string>
+    <string name="str_robot_disconnect">Disconnect</string>
     <string name="str_robot_reconnect">Reconnect</string>
     <string name="str_conn_established">Robot Connected</string>
     <string name="str_conn_reconnected">Robot Reonnected</string>
@@ -93,5 +94,8 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- &&&&&&&&&&  Play Musics &&&&&&&&&&&&&&  -->
+    <string name="str_music_play_stop">Play/Stop</string>
+    <string name="str_music_pause">Pause</string>
 
 </resources>

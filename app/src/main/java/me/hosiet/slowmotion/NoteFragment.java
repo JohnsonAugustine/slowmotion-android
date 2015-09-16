@@ -161,6 +161,15 @@ public class NoteFragment extends Fragment {
         }
     }**/
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        /* send Message to background Thread to do the reset */
+        Log.i("NoteFragment", "Now running onStop() to RESET_ALL");
+        Message msg = new Message();
+        msg.what = DebugActivity.COMMAND_RESET_ALL;
+        DebugActivity.mHandler.sendMessage(msg);
+    }
 
     /**
      * onDetach().
@@ -168,10 +177,6 @@ public class NoteFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        /* send Message to background Thread to do the reset */
-        Message msg = new Message();
-        msg.what = DebugActivity.COMMAND_RESET_ALL;
-        DebugActivity.mHandler.sendMessage(msg);
         //mListener = null;
     }
 

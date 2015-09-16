@@ -4,18 +4,32 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Debug;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MusicFragment.OnFragmentInteractionListener} interface
+ * {link MusicFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link MusicFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -32,16 +46,8 @@ public class MusicFragment extends Fragment {
     private static boolean SHOULD_LOAD_VIEW = true;
 
     /* Music list variables */
-    // Object definition
-    public class MusicList {
-        /**
-         * Constructor
-         */
-        public MusicList(String xmlStr) {
-            // OK, so we need to parse the XML.
-
-        }
-    }
+    public ArrayList<String> al_fileName = new ArrayList<>();
+    public ArrayList<Boolean> al_hasNote = new ArrayList<>();
 
     //private OnFragmentInteractionListener mListener;
 
@@ -106,23 +112,23 @@ public class MusicFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
         if (DebugActivity.socket == null || !DebugActivity.socket.isConnected()) {
             Log.e("MusicFragment:onStart()", "invalid socket, not running onStart().");
             return;
         }
 
-        /* TODO Switch to MUSIC status. */
+        /* Switch to MUSIC status and request for list. */
         Message msg = new Message();
         msg.what = DebugActivity.COMMAND_SEND;
-        msg.obj = "<command action=\"state music\"/>";
+        msg.obj = "<command action=\"state music\"/>\n<command action=\"get\" type=\"list\"/>";
         DebugActivity.mHandler.sendMessage(msg);
         DebugActivity.status = "MUSIC";
 
         /* Also obtain music list now */
-        msg.what = DebugActivity.COMMAND_RECV;
-        msg.obj = getActivity();
-        DebugActivity.mHandler.sendMessage(msg);// Later check DebugActivity.received_string
+        Message msg2 = new Message();
+        msg2.what = DebugActivity.COMMAND_RECV;
+        msg2.obj = getActivity();
+        DebugActivity.mHandler.sendMessage(msg2);// Later check DebugActivity.received_string
 
         /* Initialize various event handlers */
         View.OnClickListener playMusicOnClickListener = new View.OnClickListener() {
@@ -148,6 +154,59 @@ public class MusicFragment extends Fragment {
                 .setOnClickListener(playMusicOnClickListener);
         getActivity().findViewById(R.id.fragment_music_button_stop)
                 .setOnClickListener(stopMusicOnClickListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (DebugActivity.socket == null || !DebugActivity.socket.isConnected()) {
+            Log.e("MusicFrag:onResume()", "invalid socket, not running onResume().");
+            return;
+        }
+        /* load the song items here */
+        /* we need to do both XML parse and Spinner adaption */
+        if (DebugActivity.received_string == null) {
+            Log.e("MusicFrag:onResume()", "empty recv_string for the list!");
+            Toast.makeText(
+                    getActivity().getApplicationContext(),
+                    getActivity().getString(R.string.str_error_when_connecting)+":RECV_STR",
+                    Toast.LENGTH_SHORT
+            ).show();
+        } else {
+            String song_xmlstr = DebugActivity.received_string;
+            Spinner spinner = (Spinner) getActivity().findViewById(R.id.fragment_music_spinner);
+
+            // Now parse the XML string
+            try {
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                Document document = documentBuilder.parse(new ByteArrayInputStream(song_xmlstr.getBytes("UTF-8")));
+                Element rootElement = document.getDocumentElement();
+                NodeList items = rootElement.getElementsByTagName("music");
+                for (int i=0; i<items.getLength(); i++) {
+                    // get the metadata for each song
+                    Element item = (Element) items.item(i);
+                    al_fileName.add(item.getAttribute("filename"));
+                    al_hasNote.add(Integer.valueOf(item.getAttribute("filename")) == 1);
+                }
+            } catch (javax.xml.parsers.ParserConfigurationException pe) {
+                pe.printStackTrace();
+            } catch (java.io.UnsupportedEncodingException ee) {
+                Log.e("MusicFrag:onResume()", "Unsupported Encoding happened");
+                ee.printStackTrace();
+            } catch (org.xml.sax.SAXException se) {
+                Log.e("MusicFrag:onResume()", "Unrecognized XML happened");
+                se.printStackTrace();
+            } catch (java.io.IOException ie) {
+                Log.e("MusicFrag:onResume()", "IOException found");
+                ie.printStackTrace();
+            }
+
+            // OK. XML Parsed, now begin to write to Spinner
+
+
+
+        }
 
     }
 
@@ -156,7 +215,7 @@ public class MusicFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         if (SHOULD_LOAD_VIEW) {
-            return inflater.inflate(R.layout.fragment_note, container, false);
+            return inflater.inflate(R.layout.fragment_music, container, false);
         } else {
             return inflater.inflate(R.layout.fragment_nothing, container, false);
         }
@@ -180,6 +239,16 @@ public class MusicFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
     }*/
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        /* send Message to background Thread to do the reset */
+        Log.i("MusicFragment", "Now running onStop() to RESET_ALL");
+        Message msg = new Message();
+        msg.what = DebugActivity.COMMAND_RESET_ALL;
+        DebugActivity.mHandler.sendMessage(msg);
+    }
 
     /**
      * onDetach().
