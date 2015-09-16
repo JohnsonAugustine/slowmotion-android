@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 
 /**
@@ -27,6 +29,19 @@ public class MusicFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private static boolean SHOULD_LOAD_VIEW = true;
+
+    /* Music list variables */
+    // Object definition
+    public class MusicList {
+        /**
+         * Constructor
+         */
+        public MusicList(String xmlStr) {
+            // OK, so we need to parse the XML.
+
+        }
+    }
 
     //private OnFragmentInteractionListener mListener;
 
@@ -52,9 +67,29 @@ public class MusicFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * onCreate()
+     *
+     * Will check if the socket is null.
+     *
+     * If null, the fragment will refuse to be loaded and return to welcome status.
+     * @param savedInstanceState bundle.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /* Check for null socket. */
+        if (DebugActivity.socket == null || !DebugActivity.socket.isConnected()) {
+            SHOULD_LOAD_VIEW = false;
+            Message msg = new Message();
+            msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
+            msg.obj = getActivity();
+            ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+        } else {
+            SHOULD_LOAD_VIEW = true;
+        }
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -71,12 +106,48 @@ public class MusicFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        /* Check for null socket. */
-        if (DebugActivity.socket == null) {
-            Message msg = new Message();
-            msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
-            ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+
+        if (DebugActivity.socket == null || !DebugActivity.socket.isConnected()) {
+            Log.e("MusicFragment:onStart()", "invalid socket, not running onStart().");
+            return;
         }
+
+        /* TODO Switch to MUSIC status. */
+        Message msg = new Message();
+        msg.what = DebugActivity.COMMAND_SEND;
+        msg.obj = "<command action=\"state music\"/>";
+        DebugActivity.mHandler.sendMessage(msg);
+        DebugActivity.status = "MUSIC";
+
+        /* Also obtain music list now */
+        msg.what = DebugActivity.COMMAND_RECV;
+        msg.obj = getActivity();
+        DebugActivity.mHandler.sendMessage(msg);// Later check DebugActivity.received_string
+
+        /* Initialize various event handlers */
+        View.OnClickListener playMusicOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO FINISH IT
+                Message msg = new Message();
+                msg.what = DebugActivity.COMMAND_SEND;
+                msg.obj = "<music action=\"play\" which=\"1\"/>";
+                DebugActivity.mHandler.sendMessage(msg);
+            }
+        };
+        View.OnClickListener stopMusicOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Message msg = new Message();
+                msg.what = DebugActivity.COMMAND_SEND;
+                msg.obj = "<music action=\"stop\"/>";
+                DebugActivity.mHandler.sendMessage(msg);
+            }
+        };
+        getActivity().findViewById(R.id.fragment_music_button_play)
+                .setOnClickListener(playMusicOnClickListener);
+        getActivity().findViewById(R.id.fragment_music_button_stop)
+                .setOnClickListener(stopMusicOnClickListener);
 
     }
 
@@ -84,7 +155,11 @@ public class MusicFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_music, container, false);
+        if (SHOULD_LOAD_VIEW) {
+            return inflater.inflate(R.layout.fragment_note, container, false);
+        } else {
+            return inflater.inflate(R.layout.fragment_nothing, container, false);
+        }
     }
 
     /** // TODO: Rename method, update argument and hook method into UI event

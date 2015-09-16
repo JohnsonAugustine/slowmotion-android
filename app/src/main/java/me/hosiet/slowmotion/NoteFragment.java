@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Debug;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 
 /**
@@ -28,6 +31,7 @@ public class NoteFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private static boolean SHOULD_LOAD_VIEW = true;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -53,33 +57,75 @@ public class NoteFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * onCreate()
+     *
+     * Will check if the socket is null.
+     *
+     * If null, the fragment will refuse to be loaded and return to welcome status.
+     * @param savedInstanceState bundle.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /* Check for null|invalid socket. */
+        if (DebugActivity.socket == null || !DebugActivity.socket.isConnected()) {
+            SHOULD_LOAD_VIEW = false;
+            Message msg = new Message();
+            msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
+            msg.obj = getActivity();
+            ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+        } else {
+            SHOULD_LOAD_VIEW = true;
+        }
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
-    /**
-     * onStart().
-     *
-     * Will check if the socket is null.
-     *
-     * If null, the fragment will refuse to be loaded and return to welcome status.
-     */
     @Override
     public void onStart() {
         super.onStart();
-        /* TODO set Button Listener. */
 
-        /* Check for null socket. */
-        if (DebugActivity.socket == null) {
-            Message msg = new Message();
-            msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
-            msg.obj = getActivity();
-            ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+        if (DebugActivity.socket == null || !DebugActivity.socket.isConnected()) {
+            Log.e("NoteFragment::onStart()", "invalid socket, not running onStart().");
+            return;
+        }
+
+        /* Switch to USERPLAY status. */
+        Message msg = new Message();
+        msg.what = DebugActivity.COMMAND_SEND;
+        msg.obj = "<command action=\"state userplay\"/>";
+        DebugActivity.mHandler.sendMessage(msg);
+        DebugActivity.status = "USERPLAY";
+
+        /* set up Button Listener. */
+        View.OnClickListener notePlayOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /* Directly send out message */
+                if (DebugActivity.socket == null || ! DebugActivity.socket.isConnected()) {
+                    // Bad socket state. Return to Welcome Now.
+                    Log.e("NoteFragment::onStart()", "failed in checking socket, resetting");
+                    Message msg = new Message();
+                    msg.obj = getActivity();
+                    msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
+                    DebugActivity.socket = null;
+                    DebugActivity.status = null;
+                    ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+                } else {
+                    Message msg = new Message();
+                    msg.what = DebugActivity.COMMAND_SEND;
+                    msg.obj = "<play note=\""+v.getTag().toString()+"\"/>";
+                    DebugActivity.mHandler.sendMessage(msg);
+                }
+            }
+        };
+        for (int i = 1; i <= 8; i++) {
+            getActivity().findViewById(getResources().getIdentifier("note_button_0"+Integer.toString(i), "id", getActivity().getPackageName()))
+                    .setOnClickListener(notePlayOnClickListener);
         }
 
     }
@@ -88,7 +134,11 @@ public class NoteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_note, container, false);
+        if (SHOULD_LOAD_VIEW) {
+            return inflater.inflate(R.layout.fragment_note, container, false);
+        } else {
+            return inflater.inflate(R.layout.fragment_nothing, container, false);
+        }
     }
 
     /**

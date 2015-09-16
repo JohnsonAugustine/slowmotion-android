@@ -32,6 +32,7 @@
     <string name="str_error_when_connecting">尝试连接时发生错误，请重试。</string>
     <string name="str_error_when_disconnecting">尝试断开时发生错误，请检查日志。</string>
     <string name="str_error_when_reconnecting">尝试重新时发生错误，请检查日志。</string>
+    <string name="str_return_to_welcome">无连接。</string>
 
     <!-- PREFERENCES -->
 

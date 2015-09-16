@@ -9,7 +9,6 @@
         android:id="@+id/robot_status_textview"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:text=""
         android:background="@color/md_red_700"
         android:layout_weight="2"/>
     <EditText
@@ -18,6 +17,6 @@
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="6"
+            android:layout_weight="5"
             android:text="" />
     </LinearLayout>

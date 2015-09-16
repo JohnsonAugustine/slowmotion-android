@@ -47,6 +47,7 @@
     <string name="str_error_when_connecting">Error occurred when connecting.\nPlease try again.</string>
     <string name="str_error_when_disconnecting">Error occurred when disconnecting.\nPlease check the log.</string>
     <string name="str_error_when_reconnecting">Error occurred when reconnecting.\nPlease check the log.</string>
+    <string name="str_return_to_welcome">No Connection.</string>
 
     <!-- PREFERENCES -->
     <string name="pref_network_default_robot_addr" translatable="false">114.214.195.97</string>

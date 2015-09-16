@@ -83,13 +83,16 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                     WelcomeFragment welcomeFragment = new WelcomeFragment();
                     fragmentTransaction.add(R.id.debug_content_frame, welcomeFragment);
                     fragmentTransaction.commit();
+                    Toast.makeText(
+                            activity.getApplicationContext(),
+                            activity.getString(R.string.str_return_to_welcome),
+                            Toast.LENGTH_SHORT
+                    ).show();
                     break;
             }
         }
     }
     public MainHandler mainHandler = new MainHandler(this);
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -408,6 +411,8 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.detach(fragmentManager.findFragmentById(R.id.debug_content_frame)); //detach first
+        fragmentTransaction.commit();
+        fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.debug_content_frame, fragment); //then attach it
         fragmentTransaction.commit();
     }
