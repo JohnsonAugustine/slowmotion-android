@@ -67,6 +67,9 @@
     <string name="str_error_when_disconnecting">Error occurred when disconnecting.\nPlease check the log.</string>
     <string name="str_error_when_reconnecting">Error occurred when reconnecting.\nPlease check the log.</string>
     <string name="str_return_to_welcome">No Connection.</string>
+    <string name="str_begin_note_record">Begin Note Recording</string>
+    <string name="str_stop_note_record">Stop Note Recording &amp; Send</string>
+
 
     <!-- PREFERENCES -->
     <string name="pref_network_default_robot_addr" translatable="false">114.214.195.97</string>

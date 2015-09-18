@@ -46,20 +46,20 @@
                     android:id="@+id/button_01"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tag="@string/button_01"
-                    android:text="@string/button_01"/>
+                    android:tag="@string/tag_button_1"
+                    android:text="@string/text_button_1"/>
                 <Button
                     android:id="@+id/button_02"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tag="@string/button_02"
-                    android:text="@string/button_02"/>
+                    android:tag="@string/tag_button_2"
+                    android:text="@string/text_button_2"/>
                 <Button
                     android:id="@+id/button_03"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tag="@string/button_03"
-                    android:text="@string/button_03"/>
+                    android:tag="@string/tag_button_3"
+                    android:text="@string/text_button_3"/>
             </LinearLayout>
 
             <LinearLayout
@@ -71,20 +71,20 @@
                     android:id="@+id/button_04"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tag="@string/button_04"
-                    android:text="@string/button_04"/>
+                    android:tag="@string/tag_button_4"
+                    android:text="@string/text_button_4"/>
                 <Button
                     android:id="@+id/button_05"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tag="@string/button_05"
-                    android:text="@string/button_05"/>
+                    android:tag="@string/tag_button_5"
+                    android:text="@string/text_button_5"/>
                 <Button
                     android:id="@+id/button_06"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tag="@string/button_06"
-                    android:text="@string/button_06"/>
+                    android:tag="@string/tag_button_6"
+                    android:text="@string/text_button_6"/>
             </LinearLayout>
 
             <LinearLayout
@@ -96,14 +96,14 @@
                     android:id="@+id/button_07"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tag="@string/button_07"
-                    android:text="@string/button_07"/>
+                    android:tag="@string/tag_button_7"
+                    android:text="@string/text_button_7"/>
                 <Button
                     android:id="@+id/button_08"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tag="@string/button_08"
-                    android:text="@string/button_08"/>
+                    android:tag="@string/tag_button_8"
+                    android:text="@string/text_button_8"/>
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

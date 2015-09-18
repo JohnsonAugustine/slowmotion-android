@@ -159,7 +159,7 @@ public class Communicator {
         /* Request for music list immediately. */
         Message msg = new Message();
         msg.what = DebugActivity.COMMAND_SEND;
-        msg.obj = "<command action=\"state music\"/>\n<command action=\"get\" type=\"list\"/>";
+        msg.obj = "<music action=\"get\" type=\"list\"/>";//"<command action=\"state music\"/>\n<command action=\"get\" type=\"list\"/>";
         DebugActivity.mHandler.sendMessage(msg);
         DebugActivity.status = "MUSIC";
 

@@ -35,6 +35,8 @@
     <string name="str_error_when_disconnecting">尝试断开时发生错误，请检查日志。</string>
     <string name="str_error_when_reconnecting">尝试重新时发生错误，请检查日志。</string>
     <string name="str_return_to_welcome">无连接。</string>
+    <string name="str_begin_note_record">开始音符录制</string>
+    <string name="str_stop_note_record">结束录制并演奏</string>
 
     <!-- PREFERENCES -->
 

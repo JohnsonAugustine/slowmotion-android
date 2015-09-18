@@ -70,6 +70,8 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
     public static final int DRAWER_ID_MUSIC = 2;
     public static final int DRAWER_ID_DEBUG = 4;
     public static final int DRAWER_ID_DISCONNECT = 6;
+    public static final int DRAWER_ID_BEGIN_RECORD = 7;
+    public static final int DRAWER_ID_STOP_RECORD = 8;
     public static final int DRAWER_ID_SETTINGS = -1;
 
     /* UI Thread Handler */
@@ -137,6 +139,12 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
         SecondaryDrawerItem item4 = new SecondaryDrawerItem()
                 .withName(R.string.str_robot_disconnect)
                 .withIdentifier(DRAWER_ID_DISCONNECT);
+        SecondaryDrawerItem item5 = new SecondaryDrawerItem()
+                .withName(R.string.str_begin_note_record)
+                .withIdentifier(DRAWER_ID_BEGIN_RECORD);
+        SecondaryDrawerItem item6 = new SecondaryDrawerItem()
+                .withName(R.string.str_begin_note_record)
+                .withIdentifier(DRAWER_ID_STOP_RECORD);
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -179,6 +187,13 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         msg.what = COMMAND_DISCONNECT;
                         msg.obj = DebugActivity.this;
                         mHandler.sendMessage(msg);
+                        break;
+                    case DRAWER_ID_BEGIN_RECORD:
+                        // TODO
+                        break;
+                    case DRAWER_ID_STOP_RECORD:
+                        // TODO
+                        // Make out a persistent dialog until user cancel
                         break;
                     case DRAWER_ID_SETTINGS:
                         /* start SettingsActivity */
