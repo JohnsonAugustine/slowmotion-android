@@ -1,6 +1,8 @@
 package me.hosiet.slowmotion;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -146,6 +148,26 @@ public class Communicator {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Send requests for the music list.
+     *
+     * Will not parse it immediately. Later handled independently.
+     */
+    public static void smRequestMusicList(Activity activity) {
+        /* Request for music list immediately. */
+        Message msg = new Message();
+        msg.what = DebugActivity.COMMAND_SEND;
+        msg.obj = "<command action=\"state music\"/>\n<command action=\"get\" type=\"list\"/>";
+        DebugActivity.mHandler.sendMessage(msg);
+        DebugActivity.status = "MUSIC";
+
+        /* Also obtain music list now. */
+        Message msg2 = new Message();
+        msg2.what = DebugActivity.COMMAND_RECV;
+        msg2.obj = activity;
+        DebugActivity.mHandler.sendMessage(msg2);// Later check DebugActivity.received_string
     }
 
     /**

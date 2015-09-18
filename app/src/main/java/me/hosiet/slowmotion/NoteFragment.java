@@ -1,6 +1,7 @@
 package me.hosiet.slowmotion;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -10,8 +11,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 /**
@@ -31,7 +46,11 @@ public class NoteFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private static boolean SHOULD_LOAD_VIEW = true;
+    private static boolean SHOULD_LOAD_VIEW = true; // Determined by weather valid socket
+
+    /* Music list variables */
+    public ArrayList<String> al_fileName = new ArrayList<>();
+    public ArrayList<Boolean> al_hasNote = new ArrayList<>();
 
     //private OnFragmentInteractionListener mListener;
 
@@ -94,12 +113,8 @@ public class NoteFragment extends Fragment {
             return;
         }
 
-        /* Switch to USERPLAY status. */
-        Message msg = new Message();
-        msg.what = DebugActivity.COMMAND_SEND;
-        msg.obj = "<command action=\"state userplay\"/>";
-        DebugActivity.mHandler.sendMessage(msg);
-        DebugActivity.status = "USERPLAY";
+        /* Request for music list immediately. */
+        Communicator.smRequestMusicList(getActivity());
 
         /* set up Button Listener. */
         View.OnClickListener notePlayOnClickListener = new View.OnClickListener() {
@@ -123,12 +138,131 @@ public class NoteFragment extends Fragment {
                 }
             }
         };
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= 12; i++) {
             getActivity().findViewById(getResources().getIdentifier("note_button_0"+Integer.toString(i), "id", getActivity().getPackageName()))
                     .setOnClickListener(notePlayOnClickListener);
         }
 
+
+        /* set up music button listeners */
+        View.OnClickListener musicPlayOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /* Directly send out play message */
+                if (DebugActivity.socket == null || ! DebugActivity.socket.isConnected()) {
+                    // Bad socket state. Return to Welcome Now.
+                    Log.e("NoteFragment::onStart()", "failed in checking socket, resetting");
+                    Message msg = new Message();
+                    msg.obj = getActivity();
+                    msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
+                    DebugActivity.socket = null;
+                    DebugActivity.status = null;
+                    ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+                } else {
+                    Message msg = new Message();
+                    msg.what = DebugActivity.COMMAND_SEND;
+                    Integer pos = al_fileName.indexOf(
+                            ((Spinner) getActivity()
+                                    .findViewById(R.id.fragment_music_spinner))
+                                    .getSelectedItem()
+                                    .toString()
+                    ) + 1;
+                    msg.obj = "<music action=\"play\" which=\""+String.valueOf(pos)+"\"/>";
+                    DebugActivity.mHandler.sendMessage(msg);
+                }
+            }
+        };
+        (getActivity().findViewById(R.id.fragment_music_button_play)).setOnClickListener(musicPlayOnClickListener);
+        View.OnClickListener musicStopOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /* Directly send out play message */
+                if (DebugActivity.socket == null || ! DebugActivity.socket.isConnected()) {
+                    // Bad socket state. Return to Welcome Now.
+                    Log.e("NoteFragment::onStart()", "failed in checking socket, resetting");
+                    Message msg = new Message();
+                    msg.obj = getActivity();
+                    msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
+                    DebugActivity.socket = null;
+                    DebugActivity.status = null;
+                    ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+                } else {
+                    Message msg = new Message();
+                    msg.what = DebugActivity.COMMAND_SEND;
+                    msg.obj = "<music action=\"stop\"/>";
+                    DebugActivity.mHandler.sendMessage(msg);
+                }
+            }
+        };
+        (getActivity().findViewById(R.id.fragment_music_button_stop)).setOnClickListener(musicStopOnClickListener);
+
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (DebugActivity.socket == null || !DebugActivity.socket.isConnected()) {
+            Log.e("MusicFrag:onResume()", "invalid socket, not running onResume().");
+            return;
+        }
+
+        /* load the song items here */
+        /* we need to do both XML parse and Spinner adaption */
+        if (DebugActivity.received_string == null) {
+            Log.e("MusicFrag:onResume()", "empty recv_string for the list!");
+            Toast.makeText(
+                    getActivity().getApplicationContext(),
+                    getActivity().getString(R.string.str_error_when_connecting) + ":RECV_STR",
+                    Toast.LENGTH_SHORT
+            ).show();
+        } else {
+
+            /* parse the XML of received_string and transform into ArrarList */
+            String song_xmlstr = DebugActivity.received_string;
+            // TODO NOTE ONLY FOR DEBUG HERE!!! FIXME
+            song_xmlstr = "<musiclist><music id=\"1\" filename=\"123.mp3\" havenote=\"1\"/><music id=\"2\" filename=\"234.mp3\" havenote=\"0\"/></musiclist>";
+            Spinner spinner = (Spinner) getActivity().findViewById(R.id.fragment_music_spinner);
+
+            // Now parse the XML string
+            try {
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                Log.e("parsing", "now song_xmlstr is "+song_xmlstr);
+                Document document = documentBuilder.parse(new ByteArrayInputStream(song_xmlstr.getBytes("UTF-8")));
+                Element rootElement = document.getDocumentElement();
+                NodeList items = rootElement.getElementsByTagName("music");
+                for (int i = 0; i < items.getLength(); i++) {
+                    // get the metadata for each song
+                    Element item = (Element) items.item(i);
+                    al_fileName.add(item.getAttribute("filename"));
+                    al_hasNote.add(Integer.valueOf(item.getAttribute("havenote")) == 1);
+                }
+            } catch (javax.xml.parsers.ParserConfigurationException pe) {
+                pe.printStackTrace();
+            } catch (java.io.UnsupportedEncodingException ee) {
+                Log.e("MusicFrag:onResume()", "Unsupported Encoding happened");
+                ee.printStackTrace();
+            } catch (org.xml.sax.SAXException se) {
+                Log.e("MusicFrag:onResume()", "Unrecognized XML happened");
+                se.printStackTrace();
+            } catch (java.io.IOException ie) {
+                Log.e("MusicFrag:onResume()", "IOException found");
+                ie.printStackTrace();
+            }
+
+            /* OK. XML Parsed, now begin to write to Spinner */
+            // First, convert arraylist to string
+            String[] adaptStringList = new String[al_fileName.size()];
+            adaptStringList = al_fileName.toArray(adaptStringList);
+            // Then link adapter with Spinner
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity().getApplicationContext(), R.layout.spinner_default, adaptStringList);
+            adapter.setDropDownViewResource(R.layout.spinner_default);
+            spinner.setAdapter(adapter);
+            spinner.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

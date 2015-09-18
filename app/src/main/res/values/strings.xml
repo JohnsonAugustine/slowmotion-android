@@ -16,20 +16,38 @@
 
     <string name="title_activity_debug_default">Debugging</string>
     <string name="title_activity_debug_music">Music Play (Debug)</string>
+    <string name="title_fragment_welcome_default">Welcome</string>
 
     <!-- about drawer -->
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
 
-    <!-- 8 buttons to play the music -->
-    <string name="button_01" translatable="false">1</string>
-    <string name="button_02" translatable="false">2</string>
-    <string name="button_03" translatable="false">3</string>
-    <string name="button_04" translatable="false">4</string>
-    <string name="button_05" translatable="false">5</string>
-    <string name="button_06" translatable="false">6</string>
-    <string name="button_07" translatable="false">7</string>
-    <string name="button_08" translatable="false">8</string>
+    <!-- 12 buttons to play the music -->
+    <string name="tag_button_1" translatable="false">1</string>
+    <string name="tag_button_2" translatable="false">2</string>
+    <string name="tag_button_3" translatable="false">3</string>
+    <string name="tag_button_4" translatable="false">4</string>
+    <string name="tag_button_5" translatable="false">5</string>
+    <string name="tag_button_6" translatable="false">6</string>
+    <string name="tag_button_7" translatable="false">7</string>
+    <string name="tag_button_8" translatable="false">8</string>
+    <string name="tag_button_9" translatable="false">9</string>
+    <string name="tag_button_10" translatable="false">0</string>
+    <string name="tag_button_11" translatable="false">-</string>
+    <string name="tag_button_12" translatable="false">=</string>
+
+    <string name="text_button_1" translatable="false">1</string>
+    <string name="text_button_2" translatable="false">2</string>
+    <string name="text_button_3" translatable="false">3</string>
+    <string name="text_button_4" translatable="false">4</string>
+    <string name="text_button_5" translatable="false">5</string>
+    <string name="text_button_6" translatable="false">6</string>
+    <string name="text_button_7" translatable="false">7</string>
+    <string name="text_button_8" translatable="false">1^</string>
+    <string name="text_button_9" translatable="false">2^</string>
+    <string name="text_button_10" translatable="false">3^</string>
+    <string name="text_button_11" translatable="false">4^</string>
+    <string name="text_button_12" translatable="false">5^</string>
 
     <!-- MainActivity -->
     <string name="menu_main_settings_string">Settings</string>
@@ -95,7 +113,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- &&&&&&&&&&  Play Musics &&&&&&&&&&&&&&  -->
-    <string name="str_music_play_stop">Play/Stop</string>
-    <string name="str_music_pause">Pause</string>
+    <string name="str_music_play">Play</string>
+    <string name="str_music_stop">Stop</string>
 
 </resources>

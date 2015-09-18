@@ -63,6 +63,15 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
     public static final String NAME_ON_CREATE = "onCreate()";
     public static final String NAME_FG_HANDLER = "UI Thread Handler";
 
+    /* the drawer */
+    public static Drawer drawer;
+    /* NOTE those are both for ID and position. */
+    public static final int DRAWER_ID_NOTE = 1;
+    public static final int DRAWER_ID_MUSIC = 2;
+    public static final int DRAWER_ID_DEBUG = 4;
+    public static final int DRAWER_ID_DISCONNECT = 6;
+    public static final int DRAWER_ID_SETTINGS = -1;
+
     /* UI Thread Handler */
     protected static class MainHandler extends Handler {
         private final WeakReference<DebugActivity> mActivity;
@@ -76,6 +85,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
             switch (msg.what) {
                 case REQUEST_RETURN_WELCOME:
                     // Reset UI to welcome fragment
+                    // need msg.obj to be activity
                     Activity activity = (Activity) msg.obj;
                     FragmentManager fragmentManager = activity.getFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -88,6 +98,8 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                             activity.getString(R.string.str_return_to_welcome),
                             Toast.LENGTH_SHORT
                     ).show();
+                    // let drawer return to welcomeFragment
+                    drawer.setSelection(DRAWER_ID_DEBUG);
                     break;
             }
         }
@@ -96,12 +108,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /* NOTE those are both for ID and position. */
-        final int DRAWER_ID_NOTE = 1;
-        final int DRAWER_ID_MUSIC = 2;
-        final int DRAWER_ID_DEBUG = 4;
-        final int DRAWER_ID_DISCONNECT = 6;
-        final int DRAWER_ID_SETTINGS = -1;
+
 
         super.onCreate(savedInstanceState);
         setTitle(getString(R.string.app_name));
@@ -125,14 +132,13 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                 .withIdentifier(DRAWER_ID_MUSIC)
                 .withBadge(getString(R.string.drawer_play_music_explanation));
         PrimaryDrawerItem item3 = new PrimaryDrawerItem()
-                .withName(R.string.drawer_debug)
-                .withIdentifier(DRAWER_ID_DEBUG)
-                .withBadge("333");
+                .withName(R.string.title_fragment_welcome_default)
+                .withIdentifier(DRAWER_ID_DEBUG);
         SecondaryDrawerItem item4 = new SecondaryDrawerItem()
                 .withName(R.string.str_robot_disconnect)
                 .withIdentifier(DRAWER_ID_DISCONNECT);
 
-        final Drawer drawer = new DrawerBuilder()
+        drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(accountHeader)
                 //.withTranslucentStatusBar(false) // on Android 5+, should always be false
@@ -165,15 +171,13 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         smLoadFragment(noteFragment);
                         break;
                     case DRAWER_ID_MUSIC:
-                        /* load MusicFragment */
-                        MusicFragment musicFragment = new MusicFragment();
-                        smLoadFragment(musicFragment);
                         break;
                     case DRAWER_ID_DEBUG:
                         break;
                     case DRAWER_ID_DISCONNECT:
                         Message msg = new Message();
                         msg.what = COMMAND_DISCONNECT;
+                        msg.obj = DebugActivity.this;
                         mHandler.sendMessage(msg);
                         break;
                     case DRAWER_ID_SETTINGS:
@@ -344,6 +348,11 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                             getString(R.string.str_conn_disconnected),
                             Toast.LENGTH_SHORT
                     ).show();
+                    // Reset to WelcomeFragment
+                    Message msg2 = new Message();
+                    msg2.what = REQUEST_RETURN_WELCOME;
+                    msg2.obj = message.obj;
+                    mainHandler.sendMessage(msg2);
                 }
                 socket = null;
                 status = null;
