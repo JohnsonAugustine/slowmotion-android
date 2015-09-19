@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Debug;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -170,13 +171,25 @@ public class NoteFragment extends Fragment {
                     ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
                 } else {
                     Message msg = new Message();
+                    Message msg2 = new Message();
                     msg.what = DebugActivity.COMMAND_SEND;
+                    msg2.what = DebugActivity.COMMAND_SEND;
                     Integer pos = al_fileName.indexOf(
                             ((Spinner) getActivity()
                                     .findViewById(R.id.fragment_music_spinner))
                                     .getSelectedItem()
                                     .toString()
                     ) + 1;
+                    String yes_music_loop = "no";
+                    if (PreferenceManager.getDefaultSharedPreferences(
+                            getActivity().getApplicationContext())
+                            .getBoolean(getActivity().getString(R.string.key_pref_music_loop), false)) {
+                        // Send extra command first
+                        yes_music_loop = "yes";
+                    }
+                    msg2.obj = "<music loop=\""+yes_music_loop+"\"/>";
+                    DebugActivity.mHandler.sendMessage(mskillall wineserver
+                            
                     msg.obj = "<music action=\"play\" which=\""+String.valueOf(pos)+"\"/>";
                     DebugActivity.mHandler.sendMessage(msg);
                 }
@@ -206,6 +219,54 @@ public class NoteFragment extends Fragment {
         };
         (getActivity().findViewById(R.id.fragment_music_button_stop)).setOnClickListener(musicStopOnClickListener);
 
+
+        /* !!!!!!!!!! For music volume up and down !!!!!!!!!! */
+        View.OnClickListener musicVolumeUpOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /* Directly send out message */
+                if (DebugActivity.socket == null || ! DebugActivity.socket.isConnected()) {
+                    // Bad socket state. Return to Welcome Now.
+                    Log.e("NoteFragment::onStart()", "failed in checking socket, resetting");
+                    Message msg = new Message();
+                    msg.obj = getActivity();
+                    msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
+                    DebugActivity.socket = null;
+                    DebugActivity.status = null;
+                    ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+                } else {
+                    Message msg = new Message();
+                    msg.what = DebugActivity.COMMAND_SEND;
+                    msg.obj = "<music sound=\"up\"/>";
+                    DebugActivity.mHandler.sendMessage(msg);
+                }
+            }
+        };
+        (getActivity().findViewById(R.id.fragment_music_button_volume_up)).setOnClickListener(musicVolumeUpOnClickListener);
+
+        View.OnClickListener musicVolumeDownOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /* Directly send out message */
+                if (DebugActivity.socket == null || ! DebugActivity.socket.isConnected()) {
+                    // Bad socket state. Return to Welcome Now.
+                    Log.e("NoteFragment::onStart()", "failed in checking socket, resetting");
+                    Message msg = new Message();
+                    msg.obj = getActivity();
+                    msg.what = DebugActivity.REQUEST_RETURN_WELCOME;
+                    DebugActivity.socket = null;
+                    DebugActivity.status = null;
+                    ((DebugActivity) getActivity()).mainHandler.sendMessage(msg);
+                } else {
+                    Message msg = new Message();
+                    msg.what = DebugActivity.COMMAND_SEND;
+                    msg.obj = "<music sound=\"down\"/>";
+                    DebugActivity.mHandler.sendMessage(msg);
+                }
+            }
+        };
+        (getActivity().findViewById(R.id.fragment_music_button_volume_down)).setOnClickListener(musicVolumeDownOnClickListener);
+
     }
 
     @Override
@@ -231,7 +292,7 @@ public class NoteFragment extends Fragment {
             /* parse the XML of received_string and transform into ArrarList */
             String song_xmlstr = DebugActivity.received_string;
             // TODO NOTE ONLY FOR DEBUG HERE!!! FIXME
-            song_xmlstr = "<musiclist><music id=\"1\" filename=\"123.mp3\" havenote=\"1\"/><music id=\"2\" filename=\"234.mp3\" havenote=\"0\"/></musiclist>";
+            //song_xmlstr = "<musiclist><music id=\"1\" filename=\"123.mp3\" havenote=\"1\"/><music id=\"2\" filename=\"234.mp3\" havenote=\"0\"/></musiclist>";
             Spinner spinner = (Spinner) getActivity().findViewById(R.id.fragment_music_spinner);
 
             // Now parse the XML string

@@ -38,6 +38,8 @@
     <string name="str_begin_note_record">开始音符录制</string>
     <string name="str_stop_note_record">清除已有录制</string>
     <string name="str_play_note_record">播放录制音符</string>
+    <string name="str_volume_up">增大声音</string>
+    <string name="str_volume_down">减小声音</string>
 
     <!-- PREFERENCES -->
 
@@ -46,6 +48,7 @@
     <string name="pref_title_remote_port">机器人远程端口</string>
     <string name="pref_title_misc">杂项</string>
     <string name="pref_title_debug">启用调试模式</string>
+    <string name="pref_title_checkbox_music_loop">启用音乐循环播放</string>
 
     <!-- ========  Drawer Strings ============ -->
     <string name="drawer_play_note">弹奏音符</string>

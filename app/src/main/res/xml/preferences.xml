@@ -25,6 +25,11 @@
             android:title="@string/pref_title_debug"
             android:defaultValue="false"
             android:key="@string/key_pref_debug" />
+        <CheckBoxPreference
+            android:id="@+id/pref_checkbox_music_loop"
+            android:title="@string/pref_title_checkbox_music_loop"
+            android:defaultValue="false"
+            android:key="@string/key_pref_music_loop" />
     </PreferenceCategory>
 
 </PreferenceScreen>

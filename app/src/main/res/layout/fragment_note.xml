@@ -194,17 +194,40 @@
             android:spinnerMode="dialog">
         </Spinner>
 
-        <Button
-            android:id="@+id/fragment_music_button_play"
+        <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/str_music_play"/>
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+            <TableRow>
 
-        <Button
-            android:id="@+id/fragment_music_button_stop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/str_music_stop"/>
+                <Button
+                    android:id="@+id/fragment_music_button_play"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_music_play"/>
+
+                <Button
+                    android:id="@+id/fragment_music_button_stop"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_music_stop"/>
+
+            </TableRow>
+
+            <TableRow>
+                <Button
+                    android:id="@+id/fragment_music_button_volume_up"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_volume_up"/>
+
+                <Button
+                    android:id="@+id/fragment_music_button_volume_down"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_volume_down"/>
+            </TableRow>
+        </TableLayout>
 
     </LinearLayout>
 </LinearLayout>

@@ -70,7 +70,8 @@
     <string name="str_begin_note_record">Begin Note Recording</string>
     <string name="str_stop_note_record">Stop Note Recording</string>
     <string name="str_play_note_record">Play Recorded Note</string>
-
+    <string name="str_volume_up">Volume Up</string>
+    <string name="str_volume_down">Volume Down</string>
 
     <!-- PREFERENCES -->
     <string name="pref_network_default_robot_addr" translatable="false">114.214.195.97</string>
@@ -81,12 +82,14 @@
     <string name="pref_title_remote_port">Robot Remote Port</string>
     <string name="pref_title_misc">Misc</string>
     <string name="pref_title_debug">Enable Debug Mode</string>
+    <string name="pref_title_checkbox_music_loop">Enable Music Loop</string>
 
     <string name="key_pref_category_network" translatable="false">key_pref_category_network</string>
     <string name="key_pref_remote_addr" translatable="false">key_pref_remote_addr</string>
     <string name="key_pref_remote_port" translatable="false">key_pref_remote_port</string>
     <string name="key_pref_category_misc" translatable="false">key_pref_category_misc</string>
     <string name="key_pref_debug" translatable="false">key_pref_category_debug</string>
+    <string name="key_pref_music_loop" translatable="false">key_pref_music_loop</string>
 
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
