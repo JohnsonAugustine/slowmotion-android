@@ -5,11 +5,14 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +33,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.lang.ref.WeakReference;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import me.hosiet.slowmotion.Communicator;
 import me.hosiet.slowmotion.WelcomeFragment;
@@ -57,6 +61,14 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
     public static final int COMMAND_RESET_ALL = 6; // wrapper for COMMAND_SEND
 
     public static final int REQUEST_RETURN_WELCOME = 101;
+    public static final int REQUEST_REC_NOTE_PLAY = 102;
+    public static final int REQUEST_REC_NOTE_CLEAN = 103;
+    public static final int REQUEST_REC_NOTE_REC = 104;
+    /* NOTE REC list variables */
+    public static ArrayList<String> al_recNoteName = new ArrayList<>();
+    public static ArrayList<Long> al_recNoteTime = new ArrayList<>();
+    public static long al_recNoteTimeBegin = 0;
+
 
     /* various strings used in Logs */
     public static final String NAME_BG_THREAD = "Background Thread";
@@ -72,6 +84,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
     public static final int DRAWER_ID_DISCONNECT = 6;
     public static final int DRAWER_ID_BEGIN_RECORD = 7;
     public static final int DRAWER_ID_STOP_RECORD = 8;
+    public static final int DRAWER_ID_PLAY_RECORD = 9;
     public static final int DRAWER_ID_SETTINGS = -1;
 
     /* UI Thread Handler */
@@ -102,6 +115,55 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                     ).show();
                     // let drawer return to welcomeFragment
                     drawer.setSelection(DRAWER_ID_DEBUG);
+                    break;
+                case REQUEST_REC_NOTE_PLAY:
+                    // run in foreground and open a dialog to take the space
+                    // First, update time for further playing
+                    // TODO FIXME
+                    // NOTE!!! HAVE TO PASS A Activity with it!
+                    // Stop playing by setting al_recNoteTimeBegin to 0
+                    Activity myActivity = (Activity) msg.obj;
+                    new AlertDialog.Builder(myActivity)
+                            .setTitle("Playing Music...")
+                                    //.setIcon(R.drawable.abc_tab_indicator_material)
+                            .setMessage("Click to cancel the play.")
+                            .setPositiveButton("STOP", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // stop playback
+                                    al_recNoteTimeBegin = 0;
+                                }
+                            })
+                            .show();
+                    // start playback
+                    Long beforehand = al_recNoteTimeBegin;
+                    while (al_recNoteTimeBegin != 0 && ! al_recNoteTime.isEmpty() && !al_recNoteName.isEmpty()) {
+                        Long afterhand = al_recNoteTime.get(0);
+                        String now_noteName = al_recNoteName.get(0);
+                        Log.i("REQUEST_REC_NOTE_PLAY", "Playing note "+now_noteName+" ...");
+                        SystemClock.sleep(afterhand - beforehand);
+                        Message msg3 = new Message();
+                        msg3.what = COMMAND_SEND;
+                        msg3.obj = "<play note=\""+now_noteName+"\"/>";
+                        mHandler.sendMessage(msg3);
+                        beforehand = afterhand;
+                        al_recNoteTime.remove(0);
+                        al_recNoteName.remove(0);
+                    }
+                    Log.i("REQUEST_REC_NOTE_PLAY", "Will now stop REC play.");
+                    break;
+                case REQUEST_REC_NOTE_CLEAN:
+                    Log.i("mainHandler", "Will now CLEAN REC play.");
+                    // clean all rec vars
+                    al_recNoteTimeBegin = 0;
+                    al_recNoteName = new ArrayList<>();
+                    al_recNoteTime = new ArrayList<>();
+                    break;
+                case REQUEST_REC_NOTE_REC:
+                    Log.i("mainHandler", "Will now BEGIN REC play.");
+                    al_recNoteTimeBegin = System.currentTimeMillis();
+                    al_recNoteName = new ArrayList<>();
+                    al_recNoteTime = new ArrayList<>();
                     break;
             }
         }
@@ -143,8 +205,11 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                 .withName(R.string.str_begin_note_record)
                 .withIdentifier(DRAWER_ID_BEGIN_RECORD);
         SecondaryDrawerItem item6 = new SecondaryDrawerItem()
-                .withName(R.string.str_begin_note_record)
+                .withName(R.string.str_stop_note_record)
                 .withIdentifier(DRAWER_ID_STOP_RECORD);
+        SecondaryDrawerItem item7 = new SecondaryDrawerItem()
+                .withName(R.string.str_play_note_record)
+                .withIdentifier(DRAWER_ID_PLAY_RECORD);
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -158,7 +223,10 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         new DividerDrawerItem(),
                         item3,
                         new DividerDrawerItem(),
-                        item4
+                        item4,
+                        item5,
+                        item6,
+                        item7
                 )
                 .build();
 
@@ -190,10 +258,22 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         break;
                     case DRAWER_ID_BEGIN_RECORD:
                         // TODO
+                        Message msg4 = new Message();
+                        msg4.what = REQUEST_REC_NOTE_REC;
+                        mainHandler.sendMessage(msg4);
                         break;
                     case DRAWER_ID_STOP_RECORD:
                         // TODO
+                        Message msg2 = new Message();
+                        msg2.what = REQUEST_REC_NOTE_CLEAN;
+                        mainHandler.sendMessage(msg2);
+                        break;
+                    case DRAWER_ID_PLAY_RECORD:
                         // Make out a persistent dialog until user cancel
+                        Message msg3 = new Message();
+                        msg3.what = REQUEST_REC_NOTE_PLAY;
+                        msg3.obj = DebugActivity.this;
+                        mainHandler.sendMessage(msg3);
                         break;
                     case DRAWER_ID_SETTINGS:
                         /* start SettingsActivity */
@@ -412,10 +492,13 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
             case COMMAND_RECV:
                 Log.v(NAME_BG_THREAD, "Received COMMAND_RECV");
                 String temp_str = Communicator.smSocketGetText(socket);
-                if (temp_str == null) {
-                    Log.e(NAME_BG_THREAD, "COMMAND_RECV: null received");
+                if (temp_str == null || temp_str.equals("")) {
+                    Log.e(NAME_BG_THREAD, "COMMAND_RECV: nothing received");
+                } else {
+                    Log.i(NAME_BG_THREAD, "COMMAND_RECV: received str:"+temp_str);
                 }
                 received_string = temp_str;
+                Log.v(NAME_BG_THREAD, "End OF COMMAND_RECV procedure");
                 break;
             case COMMAND_SEND:
                 Log.v(NAME_BG_THREAD, "Received COMMAND_SEND, str is "+(String)message.obj);

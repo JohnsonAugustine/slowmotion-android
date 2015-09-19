@@ -133,14 +133,17 @@ public class Communicator {
             // Valid str should be one line text
             return null;
         }
+        Log.i("smSocketGetText()", "will now try to recv text.");
 
         // Receive all given data (by line)
-        try (InputStream is = socket.getInputStream()) {
+        try {
+            InputStream is = socket.getInputStream();
             BufferedReader lines = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             String line = lines.readLine();
             if (line == null) {
-                Log.e("Communicator", "Why null");
+                Log.e("smSocketGetText", "Got null line when recv!!");
             } else {
+                Log.i("smSocketGetText(),", "Recv() success! line is "+line);
                 return line;
             }
 

@@ -107,6 +107,7 @@ public class NoteFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        Log.i("onStart()", "this is NoteFragment::onStart()");
 
         if (DebugActivity.socket == null || !DebugActivity.socket.isConnected()) {
             Log.e("NoteFragment::onStart()", "invalid socket, not running onStart().");
@@ -135,11 +136,20 @@ public class NoteFragment extends Fragment {
                     msg.what = DebugActivity.COMMAND_SEND;
                     msg.obj = "<play note=\""+v.getTag().toString()+"\"/>";
                     DebugActivity.mHandler.sendMessage(msg);
+                    // recorder
+                    if (DebugActivity.al_recNoteTimeBegin != 0) {
+                        // record current playing into DebugActivity.al_recNote{Name, Time}
+                        String tagstr = v.getTag().toString();
+                        Long timehere = System.currentTimeMillis();
+                        Log.i("Button onClick()", "Now recording note play"+tagstr+" time:"+timehere.toString());
+                        DebugActivity.al_recNoteName.add(tagstr);
+                        DebugActivity.al_recNoteTime.add(timehere);
+                    }
                 }
             }
         };
         for (int i = 1; i <= 12; i++) {
-            getActivity().findViewById(getResources().getIdentifier("note_button_0"+Integer.toString(i), "id", getActivity().getPackageName()))
+            getActivity().findViewById(getResources().getIdentifier("note_button_"+Integer.toString(i), "id", getActivity().getPackageName()))
                     .setOnClickListener(notePlayOnClickListener);
         }
 
@@ -213,7 +223,7 @@ public class NoteFragment extends Fragment {
             Log.e("MusicFrag:onResume()", "empty recv_string for the list!");
             Toast.makeText(
                     getActivity().getApplicationContext(),
-                    getActivity().getString(R.string.str_error_when_connecting) + ":RECV_STR",
+                    getActivity().getString(R.string.str_error_when_connecting) + ":RECV_STR_ERR",
                     Toast.LENGTH_SHORT
             ).show();
         } else {
