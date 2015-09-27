@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.iflytek.cloud.SpeechConstant;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 
 import me.hosiet.slowmotion.Communicator;
 import me.hosiet.slowmotion.WelcomeFragment;
+import com.iflytek.cloud.SpeechUtility;
 
 /**
  * DebugActivity
@@ -85,6 +87,9 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
     public static final int DRAWER_ID_BEGIN_RECORD = 7;
     public static final int DRAWER_ID_STOP_RECORD = 8;
     public static final int DRAWER_ID_PLAY_RECORD = 9;
+    public static final int DRAWER_ID_PLAY_TOGETHER = 10;
+    public static final int DRAWER_ID_REBOOT = 12;
+    public static final int DRAWER_ID_POWEROFF = 13;
     public static final int DRAWER_ID_SETTINGS = -1;
 
     /* UI Thread Handler */
@@ -173,8 +178,10 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
         super.onCreate(savedInstanceState);
+
+        /* initialize iflytek libraries */
+        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID +"="+getString(R.string.str_iflytek_cloud_appid));
         setTitle(getString(R.string.app_name));
         setContentView(R.layout.activity_debug);
 
@@ -210,6 +217,16 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
         SecondaryDrawerItem item7 = new SecondaryDrawerItem()
                 .withName(R.string.str_play_note_record)
                 .withIdentifier(DRAWER_ID_PLAY_RECORD);
+        // 根据选定音乐同时播放与敲击
+        SecondaryDrawerItem item8 = new SecondaryDrawerItem()
+                .withName(R.string.str_play_note_music_together)
+                .withIdentifier(DRAWER_ID_PLAY_TOGETHER);
+        PrimaryDrawerItem item9 = new PrimaryDrawerItem()
+                .withName(R.string.str_reboot)
+                .withIdentifier(DRAWER_ID_REBOOT);
+        PrimaryDrawerItem item10 = new PrimaryDrawerItem()
+                .withName(R.string.str_poweroff)
+                .withIdentifier(DRAWER_ID_POWEROFF);
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -226,7 +243,11 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         item4,
                         item5,
                         item6,
-                        item7
+                        item7,
+                        item8,
+                        new DividerDrawerItem(),
+                        item9,
+                        item10
                 )
                 .build();
 
@@ -275,9 +296,46 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         msg3.obj = DebugActivity.this;
                         mainHandler.sendMessage(msg3);
                         break;
+                    case DRAWER_ID_PLAY_TOGETHER:
+                        // start playback of RECORD and music together
+                        // NOTE!!!!! should set music loop to TRUE!!!!!!!
+                        //
+                        // First, begin to play the music
+                        try {
+                            DebugActivity.this.findViewById(R.id.fragment_music_button_play).performClick();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(
+                                    getApplicationContext(),
+                                    "ERR: View Not load!",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                        // Second, call to start note playback. Won't stop music afterwards.
+                        // THE SAME AS DRAWER_ID_PLAY_RECORD
+                        // Make out a persistent dialog until user cancel
+                        Message msg5 = new Message();
+                        msg5.what = REQUEST_REC_NOTE_PLAY;
+                        msg5.obj = DebugActivity.this;
+                        mainHandler.sendMessage(msg5);
+                        break;
                     case DRAWER_ID_SETTINGS:
                         /* start SettingsActivity */
                         startActivity(new Intent(getApplication(), SettingsActivity.class));
+                        break;
+                    case DRAWER_ID_REBOOT:
+                        // reboot the robot
+                        Message msg6 = new Message();
+                        msg6.what = COMMAND_SEND;
+                        msg6.obj = "<command action=\"reboot\"/>";
+                        mHandler.sendMessage(msg6);
+                        break;
+                    case DRAWER_ID_POWEROFF:
+                        // poweroff the robot
+                        Message msg7 = new Message();
+                        msg7.what = COMMAND_SEND;
+                        msg7.obj = "<command action=\"poweroff\"/>";
+                        mHandler.sendMessage(msg7);
                         break;
                 }
                 drawer.closeDrawer();

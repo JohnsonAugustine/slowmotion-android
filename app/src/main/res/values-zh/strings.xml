@@ -40,6 +40,9 @@
     <string name="str_play_note_record">播放录制音符</string>
     <string name="str_volume_up">增大声音</string>
     <string name="str_volume_down">减小声音</string>
+    <string name="str_play_note_music_together">同时重放音乐与敲击</string>
+    <string name="str_reboot">重启机器人</string>
+    <string name="str_poweroff">关闭机器人</string>
 
     <!-- PREFERENCES -->
 

@@ -72,6 +72,9 @@
     <string name="str_play_note_record">Play Recorded Note</string>
     <string name="str_volume_up">Volume Up</string>
     <string name="str_volume_down">Volume Down</string>
+    <string name="str_play_note_music_together">Play Note/Music Together</string>
+    <string name="str_reboot">Reboot Robot</string>
+    <string name="str_poweroff">Poweroff Robot</string>
 
     <!-- PREFERENCES -->
     <string name="pref_network_default_robot_addr" translatable="false">114.214.195.97</string>
@@ -122,5 +125,8 @@
     <!-- &&&&&&&&&&  Play Musics &&&&&&&&&&&&&&  -->
     <string name="str_music_play">Play</string>
     <string name="str_music_stop">Stop</string>
+
+    <!-- iflytek apps -->
+    <string name="str_iflytek_cloud_appid">55fe2140</string>
 
 </resources>

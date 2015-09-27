@@ -188,10 +188,9 @@ public class NoteFragment extends Fragment {
                         yes_music_loop = "yes";
                     }
                     msg2.obj = "<music loop=\""+yes_music_loop+"\"/>";
-                    DebugActivity.mHandler.sendMessage(mskillall wineserver
-                            
                     msg.obj = "<music action=\"play\" which=\""+String.valueOf(pos)+"\"/>";
                     DebugActivity.mHandler.sendMessage(msg);
+                    DebugActivity.mHandler.sendMessage(msg2);
                 }
             }
         };
