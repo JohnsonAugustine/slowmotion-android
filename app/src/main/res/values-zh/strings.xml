@@ -13,7 +13,7 @@
     <string name="title_activity_settings">设置</string>
     <string name="title_activity_main">@string/app_name</string>
     <string name="title_drawer">功能选择</string>
-    <string name="title_activity_debug_default">测试</string>
+    <string name="title_activity_debug_default">慢动作机器人控制器</string>
     <string name="title_activity_debug_music">音乐播放（测试）</string>
     <string name="title_fragment_welcome_default">欢迎</string>
 
@@ -63,5 +63,6 @@
     <!-- &&&&&&&&&&  Play Musics &&&&&&&&&&&&&&  -->
     <string name="str_music_play">播放</string>
     <string name="str_music_stop">停止</string>
+    <string name="str_iflytek_testing">语音识别测试</string>
 
 </resources>

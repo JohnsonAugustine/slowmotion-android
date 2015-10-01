@@ -14,7 +14,7 @@
     <string name="title_activity_main">@string/app_name</string>
     <string name="title_drawer">Fuction Selection</string>
 
-    <string name="title_activity_debug_default">Debugging</string>
+    <string name="title_activity_debug_default">Slowmotion Robot Controller</string>
     <string name="title_activity_debug_music">Music Play (Debug)</string>
     <string name="title_fragment_welcome_default">Welcome</string>
 
@@ -127,6 +127,7 @@
     <string name="str_music_stop">Stop</string>
 
     <!-- iflytek apps -->
-    <string name="str_iflytek_cloud_appid">55fe2140</string>
+    <string name="str_iflytek_cloud_appid" translatable="false">55fe2140</string>
+    <string name="str_iflytek_testing">Voice Recognize Testing</string>
 
 </resources>

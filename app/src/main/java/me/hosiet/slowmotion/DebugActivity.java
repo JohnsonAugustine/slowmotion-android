@@ -22,7 +22,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.ui.RecognizerDialog;
+import com.iflytek.cloud.ui.RecognizerDialogListener;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -39,6 +43,11 @@ import java.util.ArrayList;
 import me.hosiet.slowmotion.Communicator;
 import me.hosiet.slowmotion.WelcomeFragment;
 import com.iflytek.cloud.SpeechUtility;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * DebugActivity
@@ -90,6 +99,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
     public static final int DRAWER_ID_PLAY_TOGETHER = 10;
     public static final int DRAWER_ID_REBOOT = 12;
     public static final int DRAWER_ID_POWEROFF = 13;
+    public static final int DRAWER_ID_IFLYTEK_TESTING = 14;
     public static final int DRAWER_ID_SETTINGS = -1;
 
     /* UI Thread Handler */
@@ -227,6 +237,9 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
         PrimaryDrawerItem item10 = new PrimaryDrawerItem()
                 .withName(R.string.str_poweroff)
                 .withIdentifier(DRAWER_ID_POWEROFF);
+        SecondaryDrawerItem item11 = new SecondaryDrawerItem()
+                .withName(R.string.str_iflytek_testing)
+                .withIdentifier(DRAWER_ID_IFLYTEK_TESTING);
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -247,7 +260,8 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         item8,
                         new DividerDrawerItem(),
                         item9,
-                        item10
+                        item10,
+                        item11
                 )
                 .build();
 
@@ -336,6 +350,50 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         msg7.what = COMMAND_SEND;
                         msg7.obj = "<command action=\"poweroff\"/>";
                         mHandler.sendMessage(msg7);
+                        break;
+                    case DRAWER_ID_IFLYTEK_TESTING:
+                        // start the minimal test for iflytek integration
+                        // using rapid develpment for voice input UI proviede by iflytek
+                        // can be found in section 3 of the manual
+                        RecognizerDialogListener mRecognizerDialogListener = new RecognizerDialogListener() {
+                            @Override
+                            public void onResult(RecognizerResult recognizerResult, boolean b) {
+                                String resultStr = recognizerResult.getResultString();
+                                Log.d("Raw result:", resultStr);
+                                // now try to parse the json string
+                                String voiceOutputWords = "";
+                                try {
+                                    JSONTokener jsonParser = new JSONTokener(resultStr);
+                                    JSONObject result = (JSONObject) jsonParser.nextValue();
+                                    JSONArray wsArray = result.getJSONArray("ws");
+                                    for (int i=0; i<wsArray.length(); i++) {
+                                        JSONObject phrase = (JSONObject) wsArray.get(i);
+                                        JSONArray wsArray2 = (JSONArray)phrase.get("cw");
+                                        for (int j=0; j<wsArray2.length(); j++) {
+                                            JSONObject phrase2 = (JSONObject) wsArray2.get(i);
+                                            voiceOutputWords += phrase2.get("w");
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                Log.i("Result:", voiceOutputWords);
+                            }
+
+                            @Override
+                            public void onError(SpeechError error) {
+                                Toast.makeText(
+                                        getApplicationContext(),
+                                        error.getPlainDescription(true),
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        };
+                        RecognizerDialog mDialog = new RecognizerDialog(DebugActivity.this, null);
+                        mDialog.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
+                        mDialog.setParameter(SpeechConstant.ACCENT, "mandarin");
+                        mDialog.setListener(mRecognizerDialogListener);
+                        mDialog.show();
                         break;
                 }
                 drawer.closeDrawer();
