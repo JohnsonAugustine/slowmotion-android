@@ -97,9 +97,10 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
     public static final int DRAWER_ID_STOP_RECORD = 8;
     public static final int DRAWER_ID_PLAY_RECORD = 9;
     public static final int DRAWER_ID_PLAY_TOGETHER = 10;
-    public static final int DRAWER_ID_REBOOT = 12;
-    public static final int DRAWER_ID_POWEROFF = 13;
-    public static final int DRAWER_ID_IFLYTEK_TESTING = 14;
+    public static final int DRAWER_ID_AUTOPLAY = 11;
+    public static final int DRAWER_ID_REBOOT = 13;
+    public static final int DRAWER_ID_POWEROFF = 14;
+    public static final int DRAWER_ID_IFLYTEK_TESTING = 15;
     public static final int DRAWER_ID_SETTINGS = -1;
 
     /* UI Thread Handler */
@@ -240,6 +241,10 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
         SecondaryDrawerItem item11 = new SecondaryDrawerItem()
                 .withName(R.string.str_iflytek_testing)
                 .withIdentifier(DRAWER_ID_IFLYTEK_TESTING);
+        // 选择和播放给定的音符！
+        SecondaryDrawerItem item12 = new SecondaryDrawerItem()
+                .withName(R.string.str_drawer_autoplay)
+                .withIdentifier(DRAWER_ID_AUTOPLAY);
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -258,6 +263,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         item6,
                         item7,
                         item8,
+                        item12,
                         new DividerDrawerItem(),
                         item9,
                         item10,
@@ -266,7 +272,7 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                 .build();
 
         //drawer.setSelection(3);
-        drawer.addStickyFooterItem(new PrimaryDrawerItem().withName("Settings").withIdentifier(4));
+        drawer.addStickyFooterItem(new PrimaryDrawerItem().withName(getString(R.string.title_activity_settings)).withIdentifier(4));
         drawer.setOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -366,11 +372,11 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                                     JSONTokener jsonParser = new JSONTokener(resultStr);
                                     JSONObject result = (JSONObject) jsonParser.nextValue();
                                     JSONArray wsArray = result.getJSONArray("ws");
-                                    for (int i=0; i<wsArray.length(); i++) {
+                                    for (int i = 0; i < wsArray.length(); i++) {
                                         JSONObject phrase = (JSONObject) wsArray.get(i);
-                                        JSONArray wsArray2 = (JSONArray)phrase.get("cw");
-                                        for (int j=0; j<wsArray2.length(); j++) {
-                                            JSONObject phrase2 = (JSONObject) wsArray2.get(i);
+                                        JSONArray wsArray2 = (JSONArray) phrase.get("cw");
+                                        for (int j = 0; j < wsArray2.length(); j++) {
+                                            JSONObject phrase2 = (JSONObject) wsArray2.get(j);
                                             voiceOutputWords += phrase2.get("w");
                                         }
                                     }
@@ -378,6 +384,11 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                                     e.printStackTrace();
                                 }
                                 Log.i("Result:", voiceOutputWords);
+                                Toast.makeText(
+                                        getApplicationContext(),
+                                        voiceOutputWords,
+                                        Toast.LENGTH_SHORT
+                                ).show();
                             }
 
                             @Override
@@ -394,6 +405,11 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         mDialog.setParameter(SpeechConstant.ACCENT, "mandarin");
                         mDialog.setListener(mRecognizerDialogListener);
                         mDialog.show();
+                        break;
+                    case DRAWER_ID_AUTOPLAY:
+                        // Open a floating spinner for the user to select,
+                        // and then play as said.
+                        // TODO FIXME
                         break;
                 }
                 drawer.closeDrawer();

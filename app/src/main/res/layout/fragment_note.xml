@@ -191,6 +191,7 @@
             android:id="@+id/fragment_music_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:prompt="@string/title_spinner_music"
             android:spinnerMode="dialog">
         </Spinner>
 
@@ -228,6 +229,14 @@
                     android:text="@string/str_volume_down"/>
             </TableRow>
         </TableLayout>
+
+        <Spinner
+            android:id="@+id/fragment_autoplay_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/title_spinner_music"
+            android:spinnerMode="dialog">
+        </Spinner>
 
     </LinearLayout>
 </LinearLayout>

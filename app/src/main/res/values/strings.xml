@@ -108,8 +108,8 @@
     <!-- DRAWER LIST -->
     <!-- See Also arrays.xml -->
     <string name="id_debug_drawer_list" translatable="false">2</string>
-    <string name="id_music_drawer_list" translateable="false">1</string>
-    <string name="id_note_drawer_list" translateable="false">0</string>
+    <string name="id_music_drawer_list" translateable="false" translatable="false">1</string>
+    <string name="id_note_drawer_list" translateable="false" translatable="false">0</string>
     <!-- EOF DRAWER LIST -->
 
     <!-- ========  Drawer Strings ============ -->
@@ -129,5 +129,8 @@
     <!-- iflytek apps -->
     <string name="str_iflytek_cloud_appid" translatable="false">55fe2140</string>
     <string name="str_iflytek_testing">Voice Recognize Testing</string>
+    <string name="str_drawer_autoplay">Play Given Note Songs</string>
+    <string name="title_spinner_music">Select Background Music</string>
+    <string name="title_spinner_autoplay">Select Autoplay Song</string>
 
 </resources>

@@ -64,5 +64,8 @@
     <string name="str_music_play">播放</string>
     <string name="str_music_stop">停止</string>
     <string name="str_iflytek_testing">语音识别测试</string>
+    <string name="str_drawer_autoplay">敲击给定乐曲</string>
+    <string name="title_spinner_music">选择背景音乐</string>
+    <string name="title_spinner_autoplay">选择自动敲击的乐曲</string>
 
 </resources>

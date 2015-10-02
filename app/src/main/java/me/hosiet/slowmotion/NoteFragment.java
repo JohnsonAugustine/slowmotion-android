@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,19 +40,20 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * create an instance of this fragment.
  */
 public class NoteFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
+    // T/ODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    //private static final String ARG_PARAM1 = "param1";
+    //private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    // T/ODO: Rename and change types of parameters
+    //private String mParam1;
+    //private String mParam2;
     private static boolean SHOULD_LOAD_VIEW = true; // Determined by weather valid socket
 
     /* Music list variables */
     public ArrayList<String> al_fileName = new ArrayList<>();
     public ArrayList<Boolean> al_hasNote = new ArrayList<>();
+    public static ArrayList<String> al_autoplayList = new ArrayList<>(); // Static for external use!
 
     //private OnFragmentInteractionListener mListener;
 
@@ -67,8 +69,8 @@ public class NoteFragment extends Fragment {
     public static NoteFragment newInstance(String param1, String param2) {
         NoteFragment fragment = new NoteFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        //args.putString(ARG_PARAM1, param1);
+        //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -99,10 +101,11 @@ public class NoteFragment extends Fragment {
         } else {
             SHOULD_LOAD_VIEW = true;
         }
+        /*
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        }*/
     }
 
     @Override
@@ -266,8 +269,36 @@ public class NoteFragment extends Fragment {
         };
         (getActivity().findViewById(R.id.fragment_music_button_volume_down)).setOnClickListener(musicVolumeDownOnClickListener);
 
+        // For the spinner of autoplay
+        Spinner spinner = (Spinner) getActivity().findViewById(R.id.fragment_autoplay_spinner);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.i("autoplay spinner", "selected int is "+String.valueOf(i));
+                // FIXME We assume that i is the selected number here
+                // OK. Now the only thing we need to do is to send a COMMAND_SEND to mHandler
+                // so as to send the proper command.
+                Message msg = new Message();
+                msg.what = DebugActivity.COMMAND_SEND;
+                msg.obj = "<autoplay num=\""+String.valueOf(i)+"\"/>";
+                DebugActivity.mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
     }
 
+
+    /**
+     * onResume(): run on the condition that noteFragment is resumed.
+     *
+     * Will also load music info and song(note) info from the server.
+     * TODO MOVE LOADING FUNCTIONS TO INIT FOR ONCE ONLY
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -277,7 +308,7 @@ public class NoteFragment extends Fragment {
             return;
         }
 
-        /* load the song items here */
+        /* load the song items and autoplay list here together */
         /* we need to do both XML parse and Spinner adaption */
         if (DebugActivity.received_string == null) {
             Log.e("MusicFrag:onResume()", "empty recv_string for the list!");
@@ -290,7 +321,6 @@ public class NoteFragment extends Fragment {
 
             /* parse the XML of received_string and transform into ArrarList */
             String song_xmlstr = DebugActivity.received_string;
-            // TODO NOTE ONLY FOR DEBUG HERE!!! FIXME
             //song_xmlstr = "<musiclist><music id=\"1\" filename=\"123.mp3\" havenote=\"1\"/><music id=\"2\" filename=\"234.mp3\" havenote=\"0\"/></musiclist>";
             Spinner spinner = (Spinner) getActivity().findViewById(R.id.fragment_music_spinner);
 
@@ -301,12 +331,20 @@ public class NoteFragment extends Fragment {
                 Log.e("parsing", "now song_xmlstr is "+song_xmlstr);
                 Document document = documentBuilder.parse(new ByteArrayInputStream(song_xmlstr.getBytes("UTF-8")));
                 Element rootElement = document.getDocumentElement();
+                // OK. Deal with "music" tag first.
                 NodeList items = rootElement.getElementsByTagName("music");
                 for (int i = 0; i < items.getLength(); i++) {
                     // get the metadata for each song
                     Element item = (Element) items.item(i);
                     al_fileName.add(item.getAttribute("filename"));
                     al_hasNote.add(Integer.valueOf(item.getAttribute("havenote")) == 1);
+                }
+                // Then, Deal with "automusic" tag second.
+                items = rootElement.getElementsByTagName("automusic");
+                for (int i = 0; i < items.getLength(); i++) {
+                    // get the metadata for each auto play song
+                    Element item = (Element) items.item(i);
+                    al_autoplayList.add(item.getAttribute("name"));
                 }
             } catch (javax.xml.parsers.ParserConfigurationException pe) {
                 pe.printStackTrace();
@@ -322,13 +360,26 @@ public class NoteFragment extends Fragment {
             }
 
             /* OK. XML Parsed, now begin to write to Spinner */
-            // First, convert arraylist to string
+            // No.1 for music!
+            // First, convert arrayList to string
             String[] adaptStringList = new String[al_fileName.size()];
             adaptStringList = al_fileName.toArray(adaptStringList);
             // Then link adapter with Spinner
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity().getApplicationContext(), R.layout.spinner_default, adaptStringList);
             adapter.setDropDownViewResource(R.layout.spinner_default);
             spinner.setAdapter(adapter);
+            spinner.setVisibility(View.VISIBLE);
+
+            // No.2 for autoplay!
+            // NOTE: for autoplay, this shall be called from external, so not shown here.
+            spinner = (Spinner) getActivity().findViewById(R.id.fragment_autoplay_spinner);
+            // First, convert arrayList to string
+            String[] adaptStringList2 = new String[al_autoplayList.size()];
+            adaptStringList2 = al_fileName.toArray(adaptStringList2);
+            // Then link adapter with Spinner
+            ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this.getActivity().getApplicationContext(), R.layout.spinner_default, adaptStringList2);
+            adapter2.setDropDownViewResource(R.layout.spinner_default);
+            spinner.setAdapter(adapter2);
             spinner.setVisibility(View.VISIBLE);
         }
     }
@@ -354,7 +405,7 @@ public class NoteFragment extends Fragment {
     }**/
 
     /**
-    @Override
+    @/Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
