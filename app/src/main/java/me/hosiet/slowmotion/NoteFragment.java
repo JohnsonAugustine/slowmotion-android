@@ -372,15 +372,15 @@ public class NoteFragment extends Fragment {
 
             // No.2 for autoplay!
             // NOTE: for autoplay, this shall be called from external, so not shown here.
-            spinner = (Spinner) getActivity().findViewById(R.id.fragment_autoplay_spinner);
+            Spinner spinner2 = (Spinner) getActivity().findViewById(R.id.fragment_autoplay_spinner);
             // First, convert arrayList to string
             String[] adaptStringList2 = new String[al_autoplayList.size()];
             adaptStringList2 = al_fileName.toArray(adaptStringList2);
-            // Then link adapter with Spinner
+            // Then link adapter with Spinner2
             ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this.getActivity().getApplicationContext(), R.layout.spinner_default, adaptStringList2);
             adapter2.setDropDownViewResource(R.layout.spinner_default);
-            spinner.setAdapter(adapter2);
-            spinner.setVisibility(View.VISIBLE);
+            spinner2.setAdapter(adapter2);
+            spinner2.setVisibility(View.VISIBLE);
         }
     }
 
