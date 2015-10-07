@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Spinner;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -143,7 +144,7 @@ public class Communicator {
             if (line == null) {
                 Log.e("smSocketGetText", "Got null line when recv!!");
             } else {
-                Log.i("smSocketGetText(),", "Recv() success! line is "+line);
+                Log.i("smSocketGetText(),", "Recv() success! line is " + line);
                 return line;
             }
 
@@ -171,6 +172,18 @@ public class Communicator {
         msg2.what = DebugActivity.COMMAND_RECV;
         msg2.obj = activity;
         DebugActivity.mHandler.sendMessage(msg2);// Later check DebugActivity.received_string
+    }
+
+    /**
+     * Send autoplay command to the server
+     */
+    public static void smCommandAutoplay(DebugActivity debugActivity, int id) {
+        /* send a message. */
+        /* msg: <autoplay num="X"/> */
+        Message msg8 = new Message();
+        msg8.what = DebugActivity.COMMAND_SEND;
+        msg8.obj = "<autoplay num=\""+String.valueOf(id)+"\"/>";
+        DebugActivity.mHandler.sendMessage(msg8);
     }
 
     /**

@@ -270,6 +270,7 @@ public class NoteFragment extends Fragment {
         (getActivity().findViewById(R.id.fragment_music_button_volume_down)).setOnClickListener(musicVolumeDownOnClickListener);
 
         // For the spinner of autoplay
+        /*
         Spinner spinner = (Spinner) getActivity().findViewById(R.id.fragment_autoplay_spinner);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -289,6 +290,7 @@ public class NoteFragment extends Fragment {
 
             }
         });
+        *///Disabled and use clicker
 
     }
 
@@ -340,12 +342,15 @@ public class NoteFragment extends Fragment {
                     al_hasNote.add(Integer.valueOf(item.getAttribute("havenote")) == 1);
                 }
                 // Then, Deal with "automusic" tag second.
-                items = rootElement.getElementsByTagName("automusic");
-                for (int i = 0; i < items.getLength(); i++) {
+                Log.i("NoteFrag.onRes()", "dealing automatic tag...");
+                NodeList items2 = rootElement.getElementsByTagName("automusic");
+                al_autoplayList.clear();
+                for (int i = 0; i < items2.getLength(); i++) {
                     // get the metadata for each auto play song
-                    Element item = (Element) items.item(i);
-                    al_autoplayList.add(item.getAttribute("name"));
+                    Element item2 = (Element) items2.item(i);
+                    al_autoplayList.add(item2.getAttribute("name"));
                 }
+                Log.i("NoteFrag.onRes()", "Now al_autopllayList is "+al_autoplayList.toString());
             } catch (javax.xml.parsers.ParserConfigurationException pe) {
                 pe.printStackTrace();
             } catch (java.io.UnsupportedEncodingException ee) {
@@ -375,7 +380,7 @@ public class NoteFragment extends Fragment {
             Spinner spinner2 = (Spinner) getActivity().findViewById(R.id.fragment_autoplay_spinner);
             // First, convert arrayList to string
             String[] adaptStringList2 = new String[al_autoplayList.size()];
-            adaptStringList2 = al_fileName.toArray(adaptStringList2);
+            adaptStringList2 = al_autoplayList.toArray(adaptStringList2);
             // Then link adapter with Spinner2
             ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this.getActivity().getApplicationContext(), R.layout.spinner_default, adaptStringList2);
             adapter2.setDropDownViewResource(R.layout.spinner_default);

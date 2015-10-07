@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.iflytek.cloud.RecognizerResult;
@@ -384,11 +385,38 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                                     e.printStackTrace();
                                 }
                                 Log.i("Result:", voiceOutputWords);
-                                Toast.makeText(
-                                        getApplicationContext(),
-                                        voiceOutputWords,
-                                        Toast.LENGTH_SHORT
-                                ).show();
+                                /* OK. We are playing corresponding song */
+                                String autoPlayName = null;
+                                try {
+                                    autoPlayName = voiceOutputWords.split("放")[1].split("。")[0];
+                                } catch(Exception e) {
+                                    Toast.makeText(
+                                            getApplicationContext(),
+                                            "Split Err: "+voiceOutputWords,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                                if (autoPlayName != null) {
+                                    /* find name in list */
+                                    try {
+                                        Integer pos2 = NoteFragment.al_autoplayList.indexOf(autoPlayName) + 1;
+                                         /* msg: <autoplay num="X"/> */
+                                        Toast.makeText(
+                                                getApplicationContext(),
+                                                "Now playing: "+autoPlayName,
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                        Communicator.smCommandAutoplay(DebugActivity.this, pos2);
+                                    } catch(Exception e) {
+                                        e.printStackTrace();
+                                        Toast.makeText(
+                                                getApplicationContext(),
+                                                "Song not found: "+autoPlayName,
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+
+                                }
                             }
 
                             @Override
@@ -410,7 +438,28 @@ public class DebugActivity extends AppCompatActivity implements Handler.Callback
                         // Open a floating spinner for the user to select,
                         // and then play as said.
                         // TODO FIXME
-                        break;
+                        // YES! We shall send the message HERE!
+                        /* Check connectivity. If not connected, raise a toast. */
+                        if (socket == null || !socket.isConnected()) {
+                            Toast.makeText(
+                                    getApplicationContext(),
+                                    getString(R.string.edit_message),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            break;
+                        } else {
+                            /* send a message. */
+                            Integer pos = NoteFragment.al_autoplayList.indexOf(
+                                    ((Spinner) DebugActivity.this
+                                            .findViewById(R.id.fragment_autoplay_spinner))
+                                            .getSelectedItem()
+                                            .toString()
+                            ) + 1;
+                            /* msg: <autoplay num="X"/> */
+                            Communicator.smCommandAutoplay(DebugActivity.this, pos);
+                            break;
+                        }
+
                 }
                 drawer.closeDrawer();
                 return true;
